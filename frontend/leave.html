@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leave · Axiom HRMS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+<div id="df-shell">
+  <main id="df-content">
+
+    <div class="page-head">
+      <div>
+        <h1 id="leave-page-title">Leave Management</h1>
+        <p class="ph-sub" id="leave-page-sub">Apply for leave and track your requests.</p>
+      </div>
+    </div>
+
+    <!-- ================= EMPLOYEE VIEW ================= -->
+    <div id="leave-emp-root">
+
+      <div class="row g-3 mb-3">
+        <!-- apply form -->
+        <div class="col-12 col-lg-5">
+          <div class="df-card h-100">
+            <div class="card-head"><h3 class="card-title">Apply for leave</h3></div>
+            <div class="card-body-p">
+              <div id="apply-error" class="alert df-alert df-error mb-3" style="display:none"></div>
+              <form id="leave-form" novalidate>
+                <div class="mb-3">
+                  <label class="form-label" for="leave-type">Leave type</label>
+                  <select class="form-select" id="leave-type" required>
+                    <option value="paid">Paid Leave</option>
+                    <option value="sick">Sick Leave</option>
+                    <option value="unpaid">Unpaid Leave</option>
+                  </select>
+                  <div class="form-hint" id="leave-type-hint">—</div>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <label class="form-label" for="leave-from">Start date</label>
+                    <input type="date" class="form-control" id="leave-from" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" for="leave-to">End date</label>
+                    <input type="date" class="form-control" id="leave-to" required>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="leave-remarks">Remarks</label>
+                  <textarea class="form-control" id="leave-remarks" rows="3" maxlength="240" placeholder="Reason / remarks for your HR manager (optional)"></textarea>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="chip" id="leave-days-chip">0 working days</span>
+                  <button type="submit" class="btn btn-axiom" id="leave-submit">Submit request</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- balances -->
+        <div class="col-12 col-lg-7">
+          <div class="df-card h-100">
+            <div class="card-head"><h3 class="card-title">Leave balance</h3></div>
+            <div class="card-body-p" id="leave-bal-root">
+              <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- history -->
+      <div class="df-card">
+        <div class="card-head"><h3 class="card-title">My leave history</h3></div>
+        <div class="table-wrap" id="leave-hist-wrap">
+          <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HR VIEW ================= -->
+    <div id="leave-hr-root" style="display:none">
+      <div class="chip-row mb-3" id="leave-hr-chips">
+        <span class="skeleton" style="width:120px;height:30px;border-radius:999px;display:inline-block"></span>
+      </div>
+
+      <div class="tabbar mb-3" id="leave-hr-tabs">
+        <button class="tab-link active" data-tab="pending">Pending</button>
+        <button class="tab-link" data-tab="all">All requests</button>
+        <button class="tab-link" data-tab="calendar">Calendar view</button>
+      </div>
+
+      <div id="leave-hr-list">
+        <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+      </div>
+      
+      <div id="leave-hr-calendar" style="display:none">
+        <div class="df-card">
+          <div class="card-head d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0" id="leave-cal-month-title">Calendar</h3>
+            <div>
+              <button class="btn btn-ghost btn-sm" id="leave-cal-prev">‹ Prev</button>
+              <button class="btn btn-ghost btn-sm" id="leave-cal-next">Next ›</button>
+            </div>
+          </div>
+          <div class="table-wrap p-3">
+            <div id="leave-cal-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script src="js/leave.js"></script>
+</body>
+</html>

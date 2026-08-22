@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HR Dashboard · Axiom HRMS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="df-shell">
+  <main id="df-content">
+
+    <div class="page-head">
+      <div>
+        <h1>HR Command Center</h1>
+        <p class="ph-sub" id="hr-greet-sub">Organisation overview for today.</p>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-teal" href="leave.html">Pending approvals <span class="n-dot-hr" id="hd-pending-pill" style="background:#fff;color:#0f766e;border-radius:999px;padding:1px 8px;font-size:.72rem;display:none">0</span></a>
+        <a class="btn btn-outline-axiom" href="hr-employees.html">Manage employees</a>
+      </div>
+    </div>
+
+    <!-- stat cards -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-xl-3">
+        <a href="hr-employees.html" class="text-decoration-none">
+          <div class="df-card stat-card h-100">
+            <div class="stat-icon i-indigo" id="hd-icon-emp"></div>
+            <div><div class="stat-value" id="hd-total">–</div><div class="stat-label">Total employees</div></div>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="df-card stat-card h-100">
+          <div class="stat-icon i-green" id="hd-icon-present"></div>
+          <div><div class="stat-value" id="hd-present">–</div><div class="stat-label">Present today</div><div class="stat-sub" id="hd-half"></div></div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <div class="df-card stat-card h-100">
+          <div class="stat-icon i-red" id="hd-icon-absent"></div>
+          <div><div class="stat-value" id="hd-absent">–</div><div class="stat-label">Absent today</div><div class="stat-sub" id="hd-onleave"></div></div>
+        </div>
+      </div>
+      <div class="col-6 col-xl-3">
+        <a href="leave.html" class="text-decoration-none">
+          <div class="df-card stat-card h-100">
+            <div class="stat-icon i-amber" id="hd-icon-pending"></div>
+            <div><div class="stat-value" id="hd-pending">–</div><div class="stat-label">Pending leave requests</div><div class="stat-sub">Needs your action</div></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <!-- attendance donut -->
+      <div class="col-12 col-lg-5">
+        <div class="df-card mb-3">
+          <div class="card-head"><h3 class="card-title">Today's attendance split</h3></div>
+          <div class="card-body-p" id="hd-donut">
+            <span class="skeleton sk-block"></span>
+          </div>
+        </div>
+        <!-- departments -->
+        <div class="df-card mb-3">
+          <div class="card-head"><h3 class="card-title">Departments — today</h3></div>
+          <div class="card-body-p" id="hd-depts">
+            <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+        <!-- team morale -->
+        <div class="df-card">
+          <div class="card-head"><h3 class="card-title">Team Morale — today</h3></div>
+          <div class="card-body-p" id="hd-morale">
+            <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+      </div>
+      <!-- weekly trend + payroll -->
+      <div class="col-12 col-lg-7">
+        <div class="df-card mb-3">
+          <div class="card-head"><h3 class="card-title">Attendance trend — last 7 days</h3></div>
+          <div class="card-body-p" id="hd-trend"><span class="skeleton sk-block"></span></div>
+        </div>
+        <div class="df-card">
+          <div class="card-head"><h3 class="card-title">Payroll overview — current month</h3>
+            <a class="stat-link" href="payroll.html">Manage payroll →</a></div>
+          <div class="card-body-p" id="hd-payroll"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- recent activity -->
+    <div class="df-card">
+      <div class="card-head"><h3 class="card-title">Recent activity</h3></div>
+      <div class="activity-list" id="hd-activity">
+        <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script src="js/hr.js"></script>
+</body>
+</html>
