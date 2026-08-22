@@ -92,10 +92,26 @@
       <div class="tabbar mb-3" id="leave-hr-tabs">
         <button class="tab-link active" data-tab="pending">Pending</button>
         <button class="tab-link" data-tab="all">All requests</button>
+        <button class="tab-link" data-tab="calendar">Calendar view</button>
       </div>
 
       <div id="leave-hr-list">
         <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+      </div>
+      
+      <div id="leave-hr-calendar" style="display:none">
+        <div class="df-card">
+          <div class="card-head d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0" id="leave-cal-month-title">Calendar</h3>
+            <div>
+              <button class="btn btn-ghost btn-sm" id="leave-cal-prev">‹ Prev</button>
+              <button class="btn btn-ghost btn-sm" id="leave-cal-next">Next ›</button>
+            </div>
+          </div>
+          <div class="table-wrap p-3">
+            <div id="leave-cal-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:8px;"></div>
+          </div>
+        </div>
       </div>
     </div>
 

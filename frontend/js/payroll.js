@@ -67,7 +67,10 @@ async function loadPayroll() {
           <td><b>${fmtMoney(ps.net)}</b></td>
           <td>${statusBadge(ps.status)}</td>
           <td class="text-muted-2">${ps.paidOn ? fmtDate(ps.paidOn) : '—'}</td>
-          <td><button class="btn btn-soft btn-sm" data-slip="${esc(ps.id)}">${icon('eye', 14)} View</button></td>
+          <td>
+            <button class="btn btn-soft btn-sm" data-slip="${esc(ps.id)}">${icon('eye', 14)} View</button>
+            <button class="btn btn-soft btn-sm ms-1" onclick="api.downloadPayslip('${PAY_SESSION.employeeId}', '${ps.month}')">${icon('download', 14)} PDF</button>
+          </td>
         </tr>`).join('')}
       </tbody></table></div>`;
     wrap.querySelectorAll('[data-slip]').forEach(b => b.onclick = () => viewPayslip(p.payslips.find(x => x.id === b.dataset.slip)));
@@ -107,7 +110,7 @@ function viewPayslip(ps) {
           </div>
         </div>
         <div class="d-flex justify-content-between ps-net"><span>NET PAY</span><span>${fmtMoney(ps.net)}</span></div>
-        <p class="form-hint mt-3 mb-0">${icon('info', 12)} This is a system-generated preview. PDF export will be provided by the API.</p>
+        <button class="btn btn-dayflow w-100 mt-3" onclick="api.downloadPayslip('${PAY_SESSION.employeeId}', '${ps.month}')">${icon('download', 14)} Download PDF</button>
       </div>`,
     okText: 'Close', showCancel: false, large: true,
   });

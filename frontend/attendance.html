@@ -40,7 +40,10 @@
     <div class="df-card mb-3" id="att-history-card" style="display:none">
       <div class="card-head">
         <h3 class="card-title">Attendance history</h3>
-        <input type="month" class="form-control form-control-sm" id="att-month" style="width:auto">
+        <div class="d-flex gap-2">
+          <input type="month" class="form-control form-control-sm" id="att-month" style="width:auto">
+          <button class="btn btn-outline-dayflow btn-sm" id="att-download-pdf">Export PDF</button>
+        </div>
       </div>
       <div id="att-hist-summary" class="px-3 pt-2"></div>
       <div class="table-wrap" id="att-history-body"></div>

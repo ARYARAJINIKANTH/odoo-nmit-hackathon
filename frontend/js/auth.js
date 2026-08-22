@@ -65,12 +65,36 @@ async function loginUser() {
   }
 }
 
+async function handleGoogleLogin(response) {
+  const errBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  const remember = document.getElementById('remember') ? document.getElementById('remember').checked : true;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Signing in with Google…';
+  setFormError(errBox, '');
+
+  try {
+    const session = await api.googleLogin(response.credential);
+    setSession(session, remember);
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    location.replace(next || (session.role === 'hr' ? 'hr-dashboard.html' : 'employee-dashboard.html'));
+  } catch (e) {
+    setFormError(errBox, esc(e.message));
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+}
+
 /* signup page ------------------------------------------------ */
 /**
  * signupUser() — called by the signup form.
  * Frontend validation first, then api.signup()
  * (mock now → POST /api/auth/signup later).
  */
+let CURRENT_OTP_PAYLOAD = null;
+
 async function signupUser() {
   const form = document.getElementById('signup-form');
   const errBox = document.getElementById('signup-error');
@@ -97,13 +121,97 @@ async function signupUser() {
   if (!role) { setFormError(errBox, 'Please select a role.'); return; }
 
   btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Sending OTP…';
+  setFormError(errBox, '');
+
+  try {
+    await api.sendOTP(email); // --> POST /api/auth/send-otp
+    CURRENT_OTP_PAYLOAD = { employeeId, name, email, password, role };
+    
+    // Show OTP section
+    document.getElementById('otp-section').style.display = 'block';
+    document.getElementById('signup-btn').style.display = 'none';
+    document.getElementById('google-signup-section').style.display = 'none';
+    
+    // Make form fields readonly while OTP is active
+    ['employeeId', 'name', 'semail', 'spassword', 'confirm', 'role'].forEach(id => {
+      document.getElementById(id).disabled = true;
+    });
+    
+  } catch (e) {
+    setFormError(errBox, esc(e.message));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verify Email';
+  }
+}
+
+async function completeSignup() {
+  if (!CURRENT_OTP_PAYLOAD) return;
+  const errBox = document.getElementById('signup-error');
+  const btn = document.getElementById('complete-signup-btn');
+  const otpInput = document.getElementById('otp-input');
+  const otp = otpInput.value.trim();
+  
+  if (otp.length !== 6) {
+    setFormError(errBox, 'Please enter the 6-digit OTP.');
+    return;
+  }
+  
+  btn.disabled = true;
   btn.innerHTML = '<span class="spin"></span>Creating account…';
   setFormError(errBox, '');
 
   try {
-    await api.signup({ employeeId, name, email, password, role }); // --> POST /api/auth/signup
+    await api.signup({ ...CURRENT_OTP_PAYLOAD, otp }); // --> POST /api/auth/signup
     toast('Account created. Please sign in.', 'success', 'Welcome to Dayflow');
-    location.replace('login.html?registered=' + encodeURIComponent(email));
+    location.replace('login.html?registered=' + encodeURIComponent(CURRENT_OTP_PAYLOAD.email));
+  } catch (e) {
+    setFormError(errBox, esc(e.message));
+    btn.disabled = false;
+    btn.textContent = 'Verify & Create account';
+  }
+}
+
+function cancelOTP() {
+  CURRENT_OTP_PAYLOAD = null;
+  document.getElementById('otp-section').style.display = 'none';
+  document.getElementById('signup-btn').style.display = 'block';
+  document.getElementById('google-signup-section').style.display = 'block';
+  document.getElementById('otp-input').value = '';
+  document.getElementById('signup-error').style.display = 'none';
+  
+  ['employeeId', 'name', 'semail', 'spassword', 'confirm', 'role'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+}
+
+async function handleGoogleSignup(response) {
+  const form = document.getElementById('signup-form');
+  const errBox = document.getElementById('signup-error');
+  const btn = document.getElementById('signup-btn');
+
+  const employeeId = document.getElementById('employeeId').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const role = document.getElementById('role').value;
+
+  form.classList.add('was-validated');
+
+  const empInput = document.getElementById('employeeId');
+  
+  if (!empInput.checkValidity() || !role) {
+    setFormError(errBox, 'Please provide a valid Employee ID and select a Role before signing up with Google.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Creating account via Google…';
+  setFormError(errBox, '');
+
+  try {
+    await api.googleSignup({ employeeId, name, role, credential: response.credential });
+    toast('Account created with Google. Please sign in.', 'success', 'Welcome to Dayflow');
+    location.replace('login.html?registered=' + encodeURIComponent("Google Account"));
   } catch (e) {
     setFormError(errBox, esc(e.message));
     btn.disabled = false;
@@ -141,5 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const p = document.getElementById('spassword');
       p.type = p.type === 'password' ? 'text' : 'password';
     };
+    document.getElementById('complete-signup-btn').onclick = completeSignup;
+    document.getElementById('cancel-otp-btn').onclick = cancelOTP;
   }
 });

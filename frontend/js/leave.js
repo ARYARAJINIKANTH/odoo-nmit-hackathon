@@ -20,8 +20,27 @@ async function initLeavePage() {
     document.querySelectorAll('#leave-hr-tabs .tab-link').forEach(b => b.onclick = () => {
       HR_LEAVE_TAB = b.dataset.tab;
       document.querySelectorAll('#leave-hr-tabs .tab-link').forEach(x => x.classList.toggle('active', x === b));
-      loadAllLeaveRequests();
+      
+      if (HR_LEAVE_TAB === 'calendar') {
+        document.getElementById('leave-hr-list').style.display = 'none';
+        document.getElementById('leave-hr-calendar').style.display = 'block';
+        loadCalendar();
+      } else {
+        document.getElementById('leave-hr-list').style.display = 'block';
+        document.getElementById('leave-hr-calendar').style.display = 'none';
+        loadAllLeaveRequests();
+      }
     });
+    
+    document.getElementById('leave-cal-prev').onclick = () => {
+      CALENDAR_MONTH = new Date(CALENDAR_MONTH.getFullYear(), CALENDAR_MONTH.getMonth() - 1, 1);
+      loadCalendar();
+    };
+    document.getElementById('leave-cal-next').onclick = () => {
+      CALENDAR_MONTH = new Date(CALENDAR_MONTH.getFullYear(), CALENDAR_MONTH.getMonth() + 1, 1);
+      loadCalendar();
+    };
+
     loadAllLeaveRequests();
   } else {
     initEmployeeLeave();
@@ -242,6 +261,66 @@ async function commentOnly(id) {
   });
   if (!res.confirmed) return;
   toast('Comment queued — will be delivered by the notifications API.', 'info', 'Demo note');
+}
+
+let CALENDAR_MONTH = null;
+
+async function loadCalendar() {
+  if (!CALENDAR_MONTH) {
+    const d = new Date();
+    CALENDAR_MONTH = new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+  
+  const grid = document.getElementById('leave-cal-grid');
+  const title = document.getElementById('leave-cal-month-title');
+  title.textContent = CALENDAR_MONTH.toLocaleString('default', { month: 'long', year: 'numeric' });
+  
+  try {
+    const allLeaves = await api.getAllLeaveRequests('approved');
+    
+    // Create grid headers
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let html = days.map(d => `<div style="text-align:center; font-weight:700; font-size:0.8rem; color:var(--df-muted-2); padding-bottom:8px">${d}</div>`).join('');
+    
+    const year = CALENDAR_MONTH.getFullYear();
+    const month = CALENDAR_MONTH.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Empty slots
+    for (let i = 0; i < firstDay; i++) {
+      html += `<div style="background:#f8fafc; border-radius:6px; min-height:80px; border:1px solid #f0f1f5"></div>`;
+    }
+    
+    // Days
+    for (let d = 1; d <= daysInMonth; d++) {
+      // pad month/day to match from/to format (YYYY-MM-DD)
+      const mStr = String(month + 1).padStart(2, '0');
+      const dStr = String(d).padStart(2, '0');
+      const currentDate = `${year}-${mStr}-${dStr}`;
+      
+      // Find leaves overlapping this date
+      const activeLeaves = allLeaves.filter(l => l.from <= currentDate && l.to >= currentDate);
+      
+      let leavesHtml = activeLeaves.map(l => {
+        const isStart = l.from === currentDate;
+        const color = l.type === 'paid' ? 'var(--df-primary)' : (l.type === 'sick' ? 'var(--df-red)' : 'var(--df-muted-2)');
+        const bg = l.type === 'paid' ? 'var(--df-primary-soft)' : (l.type === 'sick' ? '#fee2e2' : '#f1f5f9');
+        return `<div style="background:${bg}; color:${color}; font-size:0.7rem; font-weight:600; padding:2px 6px; border-radius:4px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${l.employeeName} - ${l.type}">
+          ${isStart ? icon('corner-down-right', 10) : ''} ${esc(l.employeeName.split(' ')[0])}
+        </div>`;
+      }).join('');
+      
+      html += `<div style="background:#fff; border-radius:6px; min-height:80px; border:1px solid #e2e8f0; padding:6px; display:flex; flex-direction:column;">
+        <span style="font-weight:600; font-size:0.85rem; margin-bottom:4px; color:#475569">${d}</span>
+        <div style="flex-grow:1; display:flex; flex-direction:column; gap:2px;">${leavesHtml}</div>
+      </div>`;
+    }
+    
+    grid.innerHTML = html;
+  } catch (e) {
+    grid.innerHTML = `<div style="grid-column:1/-1" class="alert df-alert df-error mb-0">${esc(e.message)}</div>`;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initLeavePage);

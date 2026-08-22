@@ -506,9 +506,19 @@ const api = {
     return request('POST', '/api/auth/login', { email, password });
   },
 
+  async googleLogin(credential) {
+    if (USE_MOCK_DATA) throw new Error("Google Login not supported in mock mode.");
+    return request('POST', '/api/auth/google-login', { credential });
+  },
+
   async signup({ employeeId, name, email, password, role }) {
     if (USE_MOCK_DATA) return mock.signup({ employeeId, name, email, password, role });
     return request('POST', '/api/auth/signup', { employeeId, name, email, password, role });
+  },
+
+  async googleSignup({ employeeId, name, role, credential }) {
+    if (USE_MOCK_DATA) throw new Error("Google Signup not supported in mock mode.");
+    return request('POST', '/api/auth/google-signup', { employeeId, name, role, credential });
   },
 
   /* ---------------- PROFILE ---------------- */
@@ -590,6 +600,17 @@ const api = {
     return request('GET', '/api/payroll/all');
   },
 
+  downloadPayslip(employeeId, month) {
+    if (USE_MOCK_DATA) return alert("PDF download is not supported in mock mode.");
+    window.open(`${API_CONFIG.baseUrl}/api/reports/payslip/${employeeId}/${month}?token=${getSessionToken() || ''}`, '_blank');
+  },
+
+  downloadAttendanceReport(employeeId, month) {
+    if (USE_MOCK_DATA) return alert("PDF download is not supported in mock mode.");
+    const query = month ? `?month=${month}&token=${getSessionToken() || ''}` : `?token=${getSessionToken() || ''}`;
+    window.open(`${API_CONFIG.baseUrl}/api/reports/attendance/${employeeId}${query}`, '_blank');
+  },
+
   async updateSalary(employeeId, salary) {
     if (USE_MOCK_DATA) return mock.updateSalary(employeeId, salary);
     return request('PATCH', `/api/payroll/${employeeId}`, salary);
@@ -614,6 +635,11 @@ const api = {
   async addEmployee(payload) { // HR creates an employee + login account
     if (USE_MOCK_DATA) return mock.addEmployee(payload);
     return request('POST', '/api/employees', payload);
+  },
+
+  async sendOTP(email) {
+    if (USE_MOCK_DATA) return { success: true };
+    return request('POST', '/api/auth/send-otp', { email });
   },
 
   async setEmployeeActive(employeeId, active) { // HR deactivate / reactivate

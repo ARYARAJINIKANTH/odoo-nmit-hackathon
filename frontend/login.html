@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -64,6 +65,23 @@
             <a href="#" class="small-2" onclick="toast('Password reset will be handled by the backend API.', 'info'); return false;">Forgot password?</a>
           </div>
           <button type="submit" class="btn btn-dayflow w-100" id="login-btn">Sign in</button>
+          
+          <div class="mt-4 text-center">
+            <p class="small text-muted-2 mb-2">Or sign in with</p>
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                 data-callback="handleGoogleLogin"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin d-flex justify-content-center"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+          </div>
         </form>
       </div>
 

@@ -30,6 +30,10 @@ async function initAttendancePage() {
     tabs.querySelector('[data-tab="today"]').classList.add('active');
     document.getElementById('att-month').value = toISODate(new Date()).slice(0, 7);
     document.getElementById('att-month').onchange = () => loadHistory(ATT_SESSION.employeeId);
+    document.getElementById('att-download-pdf').onclick = () => {
+      const m = document.getElementById('att-month').value;
+      api.downloadAttendanceReport(ATT_SESSION.employeeId, m);
+    };
     showTab();
   }
 }
