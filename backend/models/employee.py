@@ -69,6 +69,7 @@ class Employee(db.Model):
             "phone": self.phone,
             "address": self.address,
             "photo": self.photo,
+            "active": self.user.active if self.user else True,
             "salary": self.salary_dict(),
         }
         if include_documents:

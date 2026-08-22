@@ -1,12 +1,14 @@
 """Activities & notifications endpoints (both used by the existing frontend).
 
-GET /api/activities?limit=               → [{ts, icon, text}]
-GET /api/notifications/unread/count      → number (HR: pending leaves, employee: own pending)
+GET   /api/activities?limit=               → [{ts, icon, text}] activity feed
+GET   /api/notifications?limit=            → own notifications (read/unread persists in DB)
+GET   /api/notifications/unread/count      → number of unread notifications
+POST  /api/notifications/mark-read         → mark own notifications as read
 """
 from flask import Blueprint, g, jsonify, request
 
 from models.activity import Activity
-from models.leave import Leave
+from models.notification import Notification
 from utils.auth import login_required
 from utils.validators import parse_limit
 
@@ -22,10 +24,30 @@ def list_activities():
     return jsonify([a.to_dict() for a in activities])
 
 
+@activities_bp.get("/notifications")
+@login_required
+def list_notifications():
+    limit = parse_limit(request.args.get("limit"), default=10)
+    notifications = (Notification.query.filter_by(user_id=g.user.id)
+                     .order_by(Notification.created_at.desc())
+                     .limit(limit).all())
+    return jsonify([n.to_dict() for n in notifications])
+
+
 @activities_bp.get("/notifications/unread/count")
 @login_required
 def unread_count():
-    query = Leave.query.filter_by(status="pending")
-    if g.role != "hr":
-        query = query.filter_by(employee_id=g.employee_id)
-    return jsonify(query.count())
+    count = Notification.query.filter_by(user_id=g.user.id, is_read=False).count()
+    return jsonify(count)
+
+
+@activities_bp.post("/notifications/mark-read")
+@login_required
+def mark_notifications_read():
+    unread = Notification.query.filter_by(user_id=g.user.id, is_read=False).all()
+    for n in unread:
+        n.is_read = True
+    from extensions import db
+
+    db.session.commit()
+    return jsonify({"success": True, "marked": len(unread)})

@@ -19,8 +19,10 @@ def valid_email(value) -> bool:
     return isinstance(value, str) and bool(EMAIL_RE.match(value.strip()))
 
 
+PASSWORD_RE = re.compile(r"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$")
+
 def valid_password(value) -> bool:
-    return isinstance(value, str) and len(value) >= 6
+    return isinstance(value, str) and bool(PASSWORD_RE.match(value))
 
 
 def valid_employee_id(value) -> bool:

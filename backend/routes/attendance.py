@@ -9,7 +9,7 @@ GET   /api/attendance/all/week?monday=        (HR)
 """
 from datetime import date, datetime, timedelta
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 
 from extensions import db
 from models.activity import log_activity

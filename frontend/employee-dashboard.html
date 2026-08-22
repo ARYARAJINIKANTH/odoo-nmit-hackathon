@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · Dayflow HRMS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="df-shell">
+  <main id="df-content">
+
+    <!-- Welcome -->
+    <div class="page-head">
+      <div>
+        <h1 id="greet-title">Welcome back 👋</h1>
+        <p class="ph-sub" id="greet-sub">Loading your workday…</p>
+      </div>
+      <a class="btn btn-outline-dayflow" href="leave.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Apply for leave
+      </a>
+    </div>
+
+    <!-- Stat cards row -->
+    <div class="row g-3 mb-3">
+      <!-- Today's attendance -->
+      <div class="col-12 col-xl-6">
+        <div class="df-card h-100">
+          <div class="card-head">
+            <h3 class="card-title" id="att-card-title">Today's attendance</h3>
+            <span id="att-status-wrap"><span class="skeleton" style="width:86px;height:24px;display:inline-block"></span></span>
+          </div>
+          <div class="card-body-p" id="att-card-body">
+            <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Leave balance -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="df-card h-100">
+          <div class="card-head"><h3 class="card-title">Leave balance</h3></div>
+          <div class="card-body-p" id="leave-bal-body">
+            <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Pending requests -->
+      <div class="col-12 col-md-6 col-xl-3">
+        <a href="leave.html" class="text-decoration-none">
+          <div class="df-card stat-card h-100">
+            <div class="stat-icon i-amber" id="pending-icon"></div>
+            <div>
+              <div class="stat-value" id="pending-count">–</div>
+              <div class="stat-label">Pending leave requests</div>
+              <div class="stat-sub">Track their status</div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent leaves + activity -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-lg-7">
+        <div class="df-card h-100">
+          <div class="card-head">
+            <h3 class="card-title">Recent leave requests</h3>
+            <a class="stat-link" href="leave.html">View all →</a>
+          </div>
+          <div class="table-wrap" id="recent-leaves-wrap">
+            <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-40"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="df-card h-100">
+          <div class="card-head"><h3 class="card-title">Recent activity</h3></div>
+          <div class="activity-list" id="activity-list">
+            <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payroll summary -->
+    <div class="row g-3">
+      <div class="col-12">
+        <div class="df-card">
+          <div class="card-head">
+            <h3 class="card-title">Payroll summary <span class="badge-status s-processing" id="ps-month-chip">current month</span></h3>
+            <a class="stat-link" href="payroll.html">Full payslips →</a>
+          </div>
+          <div class="card-body-p" id="payroll-summary-body">
+            <span class="skeleton sk-line w-40"></span><span class="skeleton sk-line w-80"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script src="js/employee.js"></script>
+</body>
+</html>

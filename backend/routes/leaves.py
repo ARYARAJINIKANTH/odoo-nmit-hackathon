@@ -16,7 +16,7 @@ from models.activity import log_activity
 from models.attendance import Attendance
 from models.employee import Employee
 from models.leave import Leave
-from models.user import User
+from models.notification import notify, notify_all_hr
 from utils.auth import hr_required, login_required, self_or_hr
 from utils.responses import ApiError
 from utils.validators import LEAVE_TYPES, parse_date
@@ -115,6 +115,8 @@ def apply_leave():
     db.session.add(leave)
     log_activity("plane", f"<b>{employee.name}</b> applied for {leave_type} "
                           f"leave ({days} day{'s' if days > 1 else ''}).")
+    notify_all_hr("plane", f"<b>{employee.name}</b> applied for {leave_type} leave "
+                           f"({days} day{'s' if days > 1 else ''}) — needs review.")
     db.session.commit()
     return jsonify(leave.to_dict()), 201
 
@@ -192,17 +194,25 @@ def _decide(leave_id: str, decision: str):
 
     log_activity("check" if decision == "approved" else "x",
                  f"Leave request <b>{leave.id}</b> was <b>{decision}</b>.")
+    employee = db.session.get(Employee, leave.employee_id)
+    summary = (f"Your leave request <b>{leave.id}</b> ({leave.days} day"
+               f"{'s' if leave.days > 1 else ''}) was <b>{decision}</b>.")
+    if comment:
+        summary += f" HR comment: {comment}"
+    notify(employee.user if employee else None,
+           "check" if decision == "approved" else "x", summary)
     db.session.commit()
     return jsonify(leave.to_dict())
 
 
-@leaves_bp.patch("/<leave_id>/approved")
+# PATCH and PUT both accepted (frontend uses PATCH; API docs use PUT)
+@leaves_bp.route("/<leave_id>/approved", methods=["PATCH", "PUT"])
 @hr_required
 def approve(leave_id):
     return _decide(leave_id, "approved")
 
 
-@leaves_bp.patch("/<leave_id>/rejected")
+@leaves_bp.route("/<leave_id>/rejected", methods=["PATCH", "PUT"])
 @hr_required
 def reject(leave_id):
     return _decide(leave_id, "rejected")

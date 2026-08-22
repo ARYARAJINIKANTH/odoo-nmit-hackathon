@@ -31,9 +31,15 @@ def stats():
 
     counts = {"present": 0, "absent": 0, "half-day": 0, "leave": 0, "not-marked": 0, "weekoff": 0}
     monthly_payroll = 0
+    dept_map = {}
     for employee, status in _day_rows(today):
         counts[status] = counts.get(status, 0) + 1
         monthly_payroll += employee.net_salary()
+        dept = dept_map.setdefault(employee.department, {"name": employee.department, "total": 0, "present": 0})
+        dept["total"] += 1
+        if status in ("present", "half-day"):
+            dept["present"] += 1
+    departments = sorted(dept_map.values(), key=lambda d: -d["total"])
 
     # last 7 days attendance trend (oldest -> today), like the frontend mock
     trend = []
@@ -51,5 +57,6 @@ def stats():
         "counts": counts,
         "pendingLeaves": Leave.query.filter_by(status="pending").count(),
         "monthlyPayroll": monthly_payroll,
+        "departments": departments,
         "trend": trend,
     })

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile · Dayflow HRMS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="df-shell">
+  <main id="df-content">
+
+    <div class="page-head">
+      <div>
+        <h1>My Profile</h1>
+        <p class="ph-sub">Your personal and employment information.</p>
+      </div>
+      <span class="chip" id="profile-role-chip"><span class="badge-role emp">EMPLOYEE</span></span>
+    </div>
+
+    <!-- profile root (rendered by employee.js) -->
+    <div id="profile-root">
+      <div class="df-card mb-3"><div class="card-body-p">
+        <div class="d-flex align-items-center gap-3">
+          <span class="skeleton sk-circle"></span>
+          <div class="flex-grow-1">
+            <span class="skeleton sk-line w-40"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+      </div></div>
+      <div class="df-card mb-3"><div class="card-body-p">
+        <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span>
+      </div></div>
+    </div>
+
+    <input type="file" id="photo-input" accept="image/png, image/jpeg, image/webp" hidden>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script src="js/employee.js"></script>
+</body>
+</html>

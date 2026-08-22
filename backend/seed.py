@@ -29,18 +29,7 @@ DEMO_EMPLOYEES = [
     ("E-1002", "Arjun Mehta", "arjun@dayflow.com", "employee", "Engineering", "Software Engineer",
      "2023-02-01", "+91 99020 44556", "44 MG Road, Bengaluru",
      dict(basic=38000, hra=15200, transport=2400, special=7000, pf=4560, pt=200, insurance=1250)),
-    ("E-1003", "Sneha Iyer", "sneha@dayflow.com", "employee", "Engineering", "QA Engineer",
-     "2023-08-21", "+91 98410 77889", "8 T Nagar, Chennai",
-     dict(basic=32000, hra=12800, transport=2400, special=5200, pf=3840, pt=200, insurance=1250)),
-    ("E-1004", "Rahul Verma", "rahul@dayflow.com", "employee", "Sales", "Sales Executive",
-     "2022-11-07", "+91 90030 12345", "21 Jubilee Hills, Hyderabad",
-     dict(basic=28000, hra=11200, transport=2400, special=4500, pf=3360, pt=200, insurance=1250)),
-    ("E-1005", "Divya Nair", "divya@dayflow.com", "employee", "Finance", "Accountant",
-     "2022-04-19", "+91 97440 33445", "5 Kaloor, Kochi",
-     dict(basic=30000, hra=12000, transport=2400, special=5000, pf=3600, pt=200, insurance=1250)),
-    ("E-1006", "Karthik Raj", "karthik@dayflow.com", "employee", "Engineering", "Frontend Developer",
-     "2024-01-08", "+91 96550 66778", "17 K K Nagar, Chennai",
-     dict(basic=36000, hra=14400, transport=2400, special=6200, pf=4320, pt=200, insurance=1250)),
+
 ]
 
 DEMO_DOCUMENTS = [
@@ -98,63 +87,11 @@ def seed_demo_data(verbose: bool = True) -> None:
         user.set_password(DEMO_PASSWORD)
         db.session.add(user)
 
-        # attendance history — deterministic per employee (same rule as the frontend mock)
-        rng = random.Random(f"{emp_id}-seed")
-        for offset in range(35, 0, -1):
-            day = today - timedelta(days=offset)
-            if day.weekday() == 6:
-                db.session.add(Attendance(employee_id=emp_id, date=day, status="weekoff"))
-                continue
-            roll = rng.random()
-            if roll < 0.80:
-                rec = dict(status="present", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 17, 18, 40, 59))
-            elif roll < 0.87:
-                rec = dict(status="half-day", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 13, 14, 0, 30))
-            elif roll < 0.94:
-                rec = dict(status="absent", check_in=None, check_out=None)
-            else:
-                rec = dict(status="leave", check_in=None, check_out=None)
-            db.session.add(Attendance(employee_id=emp_id, date=day, **rec))
 
-        # today: everyone checked in EXCEPT the demo employee (E-1002) so the
-        # check-in button can be demonstrated live (same as the frontend mock)
-        today_status = "not-marked" if emp_id == "E-1002" else "present"
-        today_in = None if emp_id == "E-1002" else _rand_time(rng, 8, 9, 40, 59)
-        db.session.add(Attendance(employee_id=emp_id, date=today, status=today_status, check_in=today_in))
 
         db.session.flush()
         sync_employee_payslips(emp)
 
-    # leave requests (mirrors the frontend mock, relative to today)
-    demo_leaves = [
-        ("E-1002", "sick", 2, 3, "Fever, doctor advised rest.", "pending", None, 5),
-        ("E-1005", "paid", 7, 9, "Family function at hometown.", "pending", None, 26),
-        ("E-1003", "paid", -6, -6, "Personal work.", "approved", "Approved. Enjoy!", 8 * 24),
-        ("E-1004", "unpaid", -12, -11, "Personal trip.", "rejected", "Busy quarter — please re-plan.", 14 * 24),
-        ("E-1006", "sick", 5, 5, "Doctor consultation.", "approved", "Get well soon.", 2 * 24),
-        ("E-1002", "paid", -20, -19, "Family event.", "approved", None, 24 * 24),
-    ]
-    from datetime import datetime, timedelta as td
-    for idx, (emp_id, ltype, d1, d2, remarks, status, comment, hours_ago) in enumerate(demo_leaves, start=2001):
-        f, t = today + timedelta(days=d1), today + timedelta(days=d2)
-        db.session.add(Leave(
-            id=f"L-{idx}", employee_id=emp_id, type=ltype, from_date=f, to_date=t,
-            days=working_days_between(f, t), remarks=remarks, status=status, hr_comment=comment,
-            created_at=datetime.now() - td(hours=hours_ago),
-            decided_at=datetime.now() - td(hours=hours_ago - 2) if status != "pending" else None,
-        ))
-
-    # activity feed
-    activities = [
-        ("plane", "<b>Arjun Mehta</b> applied for Sick Leave (2 days).", 2),
-        ("wallet", "July payroll was processed for all employees.", 6),
-        ("plane", "<b>Divya Nair</b> applied for Paid Leave (3 days).", 26),
-        ("check", "<b>Priya Sharma</b> approved Sick Leave for <b>Karthik Raj</b>.", 48),
-        ("calCheck", "<b>Sneha Iyer</b> completed 12 consecutive working days.", 72),
-        ("user", "New employee <b>Karthik Raj</b> onboarded to Engineering.", 120),
-    ]
-    for icon, text, hours_ago in activities:
-        db.session.add(Activity(icon=icon, text=text, created_at=datetime.now() - td(hours=hours_ago)))
 
     db.session.commit()
 

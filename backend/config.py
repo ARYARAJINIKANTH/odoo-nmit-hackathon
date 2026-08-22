@@ -21,6 +21,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-secret-change-me")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or SECRET_KEY
     JWT_EXPIRES_HOURS = int(os.getenv("JWT_EXPIRES_HOURS", "24"))
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com")
 
     # --- database ---
     SQLALCHEMY_DATABASE_URI = os.getenv(

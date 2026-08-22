@@ -46,12 +46,27 @@ def create_app(config_name: str | None = None) -> Flask:
     if app.config["AUTO_INIT_DB"]:
         with app.app_context():
             db.create_all()
+            _ensure_schema_upgrades(app)  # migrate existing DBs in place (no data loss)
             if app.config["AUTO_SEED"]:
                 from seed import seed_if_empty
 
                 seed_if_empty(verbose=False)
 
     return app
+
+
+def _ensure_schema_upgrades(app: Flask) -> None:
+    """In-place upgrades for databases created by older versions (keeps all data).
+
+    create_all() only creates MISSING tables — it never alters existing ones,
+    so column additions for existing tables are handled here explicitly.
+    """
+    from sqlalchemy import text
+
+    with db.engine.begin() as conn:
+        user_cols = [row[1] for row in conn.execute(text("PRAGMA table_info(users)"))]
+        if user_cols and "active" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN active BOOLEAN NOT NULL DEFAULT 1"))
 
 
 app = create_app()
