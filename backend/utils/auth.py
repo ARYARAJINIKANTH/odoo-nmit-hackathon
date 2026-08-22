@@ -25,11 +25,16 @@ def create_token(user: "User") -> str:
 def _authenticate():
     """Decodes the Bearer token and attaches g.user / g.employee_id / g.role."""
     header = request.headers.get("Authorization", "")
-    if not header.startswith("Bearer "):
+    token = request.args.get("token", "")
+    
+    if header.startswith("Bearer "):
+        token = header[7:]
+        
+    if not token:
         raise ApiError("Authentication required. Please sign in.", 401)
     try:
         payload = jwt.decode(
-            header[7:], current_app.config["JWT_SECRET_KEY"], algorithms=["HS256"]
+            token, current_app.config["JWT_SECRET_KEY"], algorithms=["HS256"]
         )
     except jwt.ExpiredSignatureError:
         raise ApiError("Your session has expired. Please sign in again.", 401)

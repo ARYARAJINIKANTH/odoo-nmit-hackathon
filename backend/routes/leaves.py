@@ -18,6 +18,7 @@ from models.employee import Employee
 from models.leave import Leave
 from models.notification import notify, notify_all_hr
 from utils.auth import hr_required, login_required, self_or_hr
+from utils.email import send_leave_alert
 from utils.responses import ApiError
 from utils.validators import LEAVE_TYPES, parse_date
 
@@ -117,6 +118,12 @@ def apply_leave():
                           f"leave ({days} day{'s' if days > 1 else ''}).")
     notify_all_hr("plane", f"<b>{employee.name}</b> applied for {leave_type} leave "
                            f"({days} day{'s' if days > 1 else ''}) — needs review.")
+                           
+    send_leave_alert(
+        "hr@dayflow.demo",
+        f"New Leave Request from {employee.name}",
+        f"{employee.name} has applied for {days} days of {leave_type} leave from {from_date} to {to_date}.\nRemarks: {leave.remarks}\n\nPlease review this request in the Dayflow Dashboard."
+    )
     db.session.commit()
     return jsonify(leave.to_dict()), 201
 
@@ -201,6 +208,14 @@ def _decide(leave_id: str, decision: str):
         summary += f" HR comment: {comment}"
     notify(employee.user if employee else None,
            "check" if decision == "approved" else "x", summary)
+           
+    if employee and employee.user:
+        send_leave_alert(
+            employee.user.email,
+            f"Leave Request {decision.capitalize()}",
+            f"Hello {employee.name},\n\nYour leave request for {leave.days} days (from {leave.from_date} to {leave.to_date}) has been {decision}.\nHR Comment: {comment or 'None'}\n\nCheck your dashboard for details."
+        )
+        
     db.session.commit()
     return jsonify(leave.to_dict())
 

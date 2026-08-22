@@ -22,9 +22,31 @@ from seed import DEMO_DOCUMENTS, generate_attendance_history
 from utils.auth import create_token
 from utils.responses import ApiError
 from utils.validators import clean_str, valid_email, valid_employee_id, valid_password
+from utils.email import send_otp_email
+import random
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
+OTP_CACHE = {}
+
+@auth_bp.post("/send-otp")
+def send_otp():
+    data = request.get_json(silent=True) or {}
+    email = clean_str(data.get("email")).lower()
+    if not valid_email(email):
+        raise ApiError("Please enter a valid email address.")
+    
+    if User.query.filter(func.lower(User.email) == email).first():
+        raise ApiError("An account with this email already exists.", 409)
+        
+    otp = str(random.randint(100000, 999999))
+    OTP_CACHE[email] = otp
+    
+    # Send email
+    if not send_otp_email(email, otp):
+        raise ApiError("Failed to send OTP email.", 500)
+        
+    return jsonify({"success": True, "message": "OTP sent successfully."}), 200
 
 @auth_bp.post("/signup")
 def signup():
@@ -34,6 +56,7 @@ def signup():
     email = clean_str(data.get("email")).lower()
     password = data.get("password") or ""
     role = data.get("role")
+    otp = data.get("otp")
 
     # ---- validation ----
     if not valid_employee_id(employee_id):
@@ -46,12 +69,18 @@ def signup():
         raise ApiError("Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.")
     if role not in ("employee", "hr"):
         raise ApiError("Please select a valid role.")
+    
+    if not otp or OTP_CACHE.get(email) != str(otp):
+        raise ApiError("Invalid or missing OTP.", 400)
 
     # ---- duplicate checks (case-insensitive; same messages as the frontend mock) ----
     if User.query.filter(func.lower(User.email) == email).first():
         raise ApiError("An account with this email already exists.", 409)
     if db.session.get(Employee, employee_id):
         raise ApiError("This Employee ID is already registered.", 409)
+
+    # Clear OTP from cache
+    OTP_CACHE.pop(email, None)
 
     employee = Employee(
         id=employee_id, name=name, department="General", position="Team Member",
