@@ -33,6 +33,7 @@ def _record_or_default(employee_id: str, day: date):
         "status": Attendance.default_status_for(day),
         "checkIn": None,
         "checkOut": None,
+        "mood": None,
     }
     return None, default
 
@@ -74,7 +75,10 @@ def check_in():
 
     record.check_in = _now_hhmm()
     record.status = "present"
-    log_activity("clockIn", f"<b>{employee.name}</b> checked in at {record.check_in}.")
+    record.mood = data.get("mood")
+    
+    mood_emoji = f" (Mood: {record.mood})" if record.mood else ""
+    log_activity("clockIn", f"<b>{employee.name}</b> checked in at {record.check_in}{mood_emoji}.")
     db.session.commit()
     return jsonify(record.to_dict())
 

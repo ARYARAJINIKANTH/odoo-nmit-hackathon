@@ -1,4 +1,4 @@
-"""Dayflow backend configuration.
+"""Axiom backend configuration.
 
 All secrets come from environment variables (.env for local development).
 No real secrets are hardcoded — the fallbacks below exist ONLY for local
@@ -25,7 +25,7 @@ class Config:
 
     # --- database ---
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "dayflow.db")
+        "DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "axiom.db")
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
