@@ -1,9 +1,10 @@
 -- ============================================================
 -- Dayflow HRMS - SQLite schema (mirrors backend/models/*.py)
 --
--- The Flask app creates/upgrade these tables automatically via
--- SQLAlchemy (db.create_all() + _ensure_schema_upgrades).
--- Manual application:  sqlite3 dayflow.db < database/schema.sql
+-- The Flask app creates these tables automatically via
+-- SQLAlchemy (db.create_all()). This file documents the schema
+-- and can be applied manually with:
+--     sqlite3 dayflow.db < database/schema.sql
 -- ============================================================
 PRAGMA foreign_keys = ON;
 
@@ -37,7 +38,6 @@ CREATE TABLE users (
 	email VARCHAR(120) NOT NULL, 
 	password_hash VARCHAR(255) NOT NULL, 
 	role VARCHAR(10) NOT NULL, 
-	active BOOLEAN NOT NULL, 
 	employee_id VARCHAR(15) NOT NULL, 
 	created_at DATETIME NOT NULL, 
 	PRIMARY KEY (id), 
@@ -58,8 +58,8 @@ CREATE TABLE attendance (
 	CONSTRAINT uq_attendance_employee_date UNIQUE (employee_id, date), 
 	FOREIGN KEY(employee_id) REFERENCES employees (id) ON DELETE CASCADE
 );
-CREATE INDEX ix_attendance_date ON attendance (date);
 CREATE INDEX ix_attendance_employee_id ON attendance (employee_id);
+CREATE INDEX ix_attendance_date ON attendance (date);
 
 -- leaves
 CREATE TABLE leaves (
@@ -105,19 +105,6 @@ CREATE TABLE payrolls (
 	FOREIGN KEY(employee_id) REFERENCES employees (id) ON DELETE CASCADE
 );
 CREATE INDEX ix_payrolls_employee_id ON payrolls (employee_id);
-
--- notifications
-CREATE TABLE notifications (
-	id INTEGER NOT NULL, 
-	user_id INTEGER NOT NULL, 
-	icon VARCHAR(20) NOT NULL, 
-	text TEXT NOT NULL, 
-	is_read BOOLEAN NOT NULL, 
-	created_at DATETIME NOT NULL, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-CREATE INDEX ix_notification_user_read ON notifications (user_id, is_read);
 
 -- activities
 CREATE TABLE activities (
