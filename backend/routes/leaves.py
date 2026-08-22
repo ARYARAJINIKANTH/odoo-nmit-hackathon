@@ -18,7 +18,7 @@ from models.employee import Employee
 from models.leave import Leave
 from models.notification import notify, notify_all_hr
 from utils.auth import hr_required, login_required, self_or_hr
-from utils.email import send_leave_alert
+from utils.email import send_leave_alert, generate_ics
 from utils.responses import ApiError
 from utils.validators import LEAVE_TYPES, parse_date
 
@@ -120,9 +120,9 @@ def apply_leave():
                            f"({days} day{'s' if days > 1 else ''}) — needs review.")
                            
     send_leave_alert(
-        "hr@dayflow.demo",
+        "hr@axiom.demo",
         f"New Leave Request from {employee.name}",
-        f"{employee.name} has applied for {days} days of {leave_type} leave from {from_date} to {to_date}.\nRemarks: {leave.remarks}\n\nPlease review this request in the Dayflow Dashboard."
+        f"{employee.name} has applied for {days} days of {leave_type} leave from {from_date} to {to_date}.\nRemarks: {leave.remarks}\n\nPlease review this request in the Axiom Dashboard."
     )
     db.session.commit()
     return jsonify(leave.to_dict()), 201
@@ -210,10 +210,24 @@ def _decide(leave_id: str, decision: str):
            "check" if decision == "approved" else "x", summary)
            
     if employee and employee.user:
+        attachment_name = None
+        attachment_data = None
+        if decision == "approved":
+            attachment_name = f"leave_{leave.id}.ics"
+            attachment_data = generate_ics(
+                leave.id, 
+                leave.from_date, 
+                leave.to_date, 
+                employee.name, 
+                leave.type
+            )
+            
         send_leave_alert(
             employee.user.email,
             f"Leave Request {decision.capitalize()}",
-            f"Hello {employee.name},\n\nYour leave request for {leave.days} days (from {leave.from_date} to {leave.to_date}) has been {decision}.\nHR Comment: {comment or 'None'}\n\nCheck your dashboard for details."
+            f"Hello {employee.name},\n\nYour leave request for {leave.days} days (from {leave.from_date} to {leave.to_date}) has been {decision}.\nHR Comment: {comment or 'None'}\n\nCheck your dashboard for details.",
+            attachment_name=attachment_name,
+            attachment_data=attachment_data
         )
         
     db.session.commit()

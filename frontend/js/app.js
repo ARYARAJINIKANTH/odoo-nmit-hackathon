@@ -1,10 +1,19 @@
 /* =========================================================
-   DAYFLOW – app.js  (shared UI core, loaded on EVERY page)
+   AXIOM – app.js  (shared UI core, loaded on EVERY page)
    ---------------------------------------------------------
    Contains: session storage, auth guards, app shell (sidebar +
    topbar), toast + confirm-modal helpers, icons, formatters.
    NOTE: no data logic lives here — data comes only from api.js
    ========================================================= */
+
+// Apply theme ASAP to prevent flicker
+(() => {
+  try {
+    if (localStorage.getItem('df_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  } catch(e) {}
+})();
 
 /* ---------- safe storage (works even in restricted preview iframes) ---------- */
 const Storage = (() => {
@@ -19,7 +28,7 @@ const Storage = (() => {
 })();
 
 /* ---------- session ---------- */
-const SESSION_KEY = 'dayflow_session';
+const SESSION_KEY = 'axiom_session';
 
 function getSession() {
   try { return JSON.parse(Storage.get(SESSION_KEY) || 'null'); } catch (e) { return null; }
@@ -90,6 +99,7 @@ const ICONS = {
   money: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
   inbox: '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
   eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
 };
 
 function icon(name, size) {
@@ -162,7 +172,7 @@ function toast(message, type = 'success', title) {
 }
 
 /* ---------- confirm / form modal (returns Promise) ---------- */
-function openModal({ title, body, okText = 'Confirm', okClass = 'btn-dayflow', cancelText = 'Cancel', showCancel = true, commentField }) {
+function openModal({ title, body, okText = 'Confirm', okClass = 'btn-axiom', cancelText = 'Cancel', showCancel = true, commentField }) {
   return new Promise(resolve => {
     const back = document.createElement('div');
     back.className = 'df-modal-backdrop';
@@ -197,7 +207,7 @@ function openModal({ title, body, okText = 'Confirm', okClass = 'btn-dayflow', c
  *   return false  -> keep modal open (validation failed)
  *   return true/undefined -> close it.
  */
-function openFormModal({ title, body, okText = 'Save', okClass = 'btn-dayflow', cancelText = 'Cancel', onOk, large }) {
+function openFormModal({ title, body, okText = 'Save', okClass = 'btn-axiom', cancelText = 'Cancel', onOk, large }) {
   const back = document.createElement('div');
   back.className = 'df-modal-backdrop';
   back.innerHTML = `
@@ -271,8 +281,8 @@ function initShell({ active, title, sub }) {
   shell.innerHTML = `
     <aside class="df-sidebar" id="df-sidebar">
       <a class="side-brand" href="${s.role === 'hr' ? 'hr-dashboard.html' : 'employee-dashboard.html'}">
-        <img src="assets/logo.svg" width="34" height="34" alt="Dayflow logo">
-        <span class="brand-word">Day<span class="accent">flow</span></span>
+        <img src="assets/logo.svg" width="34" height="34" alt="Axiom logo">
+        <span class="brand-word">Axi<span class="accent">om</span></span>
       </a>
       <nav class="side-nav">
         <div class="side-group-label">${roleLabel} Menu</div>
@@ -299,6 +309,9 @@ function initShell({ active, title, sub }) {
         </div>
         <div class="topbar-right">
           <span class="topbar-date">${fmtDateLong()}</span>
+          <button class="icon-btn" id="df-theme-toggle" aria-label="Toggle Dark Mode">
+            ${icon(document.documentElement.classList.contains('dark') ? 'sun' : 'moon', 18)}
+          </button>
           <div style="position:relative">
             <button class="icon-btn" id="df-bell" aria-label="Notifications">
               ${icon('bell', 18)}<span class="n-dot" id="df-bell-dot" style="display:none">0</span>
@@ -316,8 +329,16 @@ function initShell({ active, title, sub }) {
   document.getElementById('df-hamburger').onclick = () => { sidebar.classList.toggle('open'); backdrop.classList.toggle('show', sidebar.classList.contains('open')); };
   backdrop.onclick = () => { sidebar.classList.remove('open'); backdrop.classList.remove('show'); };
 
+  // theme toggle
+  const themeToggle = document.getElementById('df-theme-toggle');
+  themeToggle.onclick = () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    Storage.set('df_theme', isDark ? 'dark' : 'light');
+    themeToggle.innerHTML = icon(isDark ? 'sun' : 'moon', 18);
+  };
+
   document.getElementById('df-logout').onclick = async () => {
-    if (await confirmAction({ title: 'Log out?', body: '<p class="mb-0 text-muted-2">You will need to sign in again to access your Dayflow workspace.</p>', okText: 'Log out', okClass: 'btn-danger-soft' })) logoutUser();
+    if (await confirmAction({ title: 'Log out?', body: '<p class="mb-0 text-muted-2">You will need to sign in again to access your Axiom workspace.</p>', okText: 'Log out', okClass: 'btn-danger-soft' })) logoutUser();
   };
 
   // notifications dropdown — real per-user notifications from the API (read/unread persists in DB)
@@ -366,3 +387,86 @@ function initShell({ active, title, sub }) {
 
 /* simple debouncer for search boxes */
 function debounce(fn, ms = 250) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+/* AI Chat Widget */
+function initAIWidget() {
+  if (document.getElementById('ai-widget')) return;
+  const fab = document.createElement('div');
+  fab.className = 'ai-fab';
+  fab.innerHTML = icon('message-square', 24);
+  document.body.appendChild(fab);
+
+  const widget = document.createElement('div');
+  widget.className = 'ai-widget';
+  widget.id = 'ai-widget';
+  widget.innerHTML = `
+    <div class="ai-header">
+      <div class="d-flex align-items-center gap-2">${icon('cpu', 18)} Axiom AI</div>
+      <div style="cursor:pointer" class="ai-close">${icon('x', 18)}</div>
+    </div>
+    <div class="ai-messages" id="ai-messages">
+      <div class="ai-msg bot">Hi there! 👋 I'm Axiom AI. I can answer questions about company policies (leave, attendance, payroll, holidays). Try asking me!</div>
+    </div>
+    <div class="ai-input-area">
+      <input type="text" id="ai-input" placeholder="Ask a question..." autocomplete="off">
+      <button id="ai-send" disabled>${icon('send', 16)}</button>
+    </div>
+  `;
+  document.body.appendChild(widget);
+
+  const messagesDiv = document.getElementById('ai-messages');
+  const input = document.getElementById('ai-input');
+  const sendBtn = document.getElementById('ai-send');
+  let open = false;
+
+  const toggle = () => {
+    open = !open;
+    widget.classList.toggle('open', open);
+    if (open) setTimeout(() => input.focus(), 300);
+  };
+  fab.onclick = toggle;
+  widget.querySelector('.ai-close').onclick = toggle;
+
+  const addMsg = (text, isBot) => {
+    const d = document.createElement('div');
+    d.className = `ai-msg ${isBot ? 'bot' : 'user'}`;
+    d.textContent = text;
+    messagesDiv.appendChild(d);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  };
+
+  const send = async () => {
+    const text = input.value.trim();
+    if (!text) return;
+    addMsg(text, false);
+    input.value = '';
+    sendBtn.disabled = true;
+    input.disabled = true;
+    
+    // show typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'ai-msg bot';
+    typing.innerHTML = '<span class="spin" style="width:14px;height:14px;border-width:2px;margin:0"></span>';
+    messagesDiv.appendChild(typing);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const res = await api.askAI(text);
+      messagesDiv.removeChild(typing);
+      addMsg(res.reply, true);
+    } catch (e) {
+      messagesDiv.removeChild(typing);
+      addMsg('Oops, something went wrong. Try again.', true);
+    }
+    input.disabled = false;
+    input.focus();
+  };
+
+  input.addEventListener('input', () => sendBtn.disabled = !input.value.trim());
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') send(); });
+  sendBtn.addEventListener('click', send);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (Storage.get(SESSION_KEY)) initAIWidget();
+});

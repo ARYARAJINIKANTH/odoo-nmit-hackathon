@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – hr.js  (hr-dashboard.html + hr-employees.html)
+   AXIOM – hr.js  (hr-dashboard.html + hr-employees.html)
    UI logic only — all data comes from the `api` object.
    ========================================================= */
 
@@ -88,8 +88,31 @@ async function initHrDashboard() {
             </div>`).join('')}
         </div>` : emptyState('No departments yet');
     }
+
+    /* morale breakdown */
+    const moraleRoot = document.getElementById('hd-morale');
+    if (moraleRoot && stats.moodCounts) {
+      const moods = stats.moodCounts;
+      const totalMoods = Object.values(moods).reduce((a, b) => a + b, 0) || 1;
+      moraleRoot.innerHTML = Object.keys(moods).length ? `
+        <div class="d-flex justify-content-around align-items-center text-center">
+          ${Object.entries(moods).map(([mood, count]) => `
+            <div>
+              <div style="font-size:2rem;margin-bottom:4px">${mood}</div>
+              <div style="font-weight:700;color:var(--df-ink)">${count}</div>
+              <div class="text-muted-2 small-2">${Math.round(count/totalMoods*100)}%</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : emptyState('No vibe checks yet today');
+    }
   } catch (e) {
     toast(e.message, 'error', 'Could not load dashboard');
+    document.getElementById('hd-total').textContent = '--';
+    document.getElementById('hd-present').textContent = '--';
+    document.getElementById('hd-absent').textContent = '--';
+    document.getElementById('hd-onleave').textContent = '--';
+    document.getElementById('hd-donut').innerHTML = emptyState('Dashboard load error');
   }
 
   loadHrActivity();

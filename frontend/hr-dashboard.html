@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HR Dashboard · Dayflow HRMS</title>
+  <title>HR Dashboard · Axiom HRMS</title>
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.css">
@@ -20,7 +20,7 @@
       </div>
       <div class="d-flex gap-2 flex-wrap">
         <a class="btn btn-teal" href="leave.html">Pending approvals <span class="n-dot-hr" id="hd-pending-pill" style="background:#fff;color:#0f766e;border-radius:999px;padding:1px 8px;font-size:.72rem;display:none">0</span></a>
-        <a class="btn btn-outline-dayflow" href="hr-employees.html">Manage employees</a>
+        <a class="btn btn-outline-axiom" href="hr-employees.html">Manage employees</a>
       </div>
     </div>
 
@@ -66,9 +66,16 @@
           </div>
         </div>
         <!-- departments -->
-        <div class="df-card">
+        <div class="df-card mb-3">
           <div class="card-head"><h3 class="card-title">Departments — today</h3></div>
           <div class="card-body-p" id="hd-depts">
+            <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
+          </div>
+        </div>
+        <!-- team morale -->
+        <div class="df-card">
+          <div class="card-head"><h3 class="card-title">Team Morale — today</h3></div>
+          <div class="card-body-p" id="hd-morale">
             <span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span>
           </div>
         </div>

@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in · Dayflow HRMS</title>
+  <title>Sign in · Axiom HRMS</title>
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -16,8 +15,8 @@
   <aside class="auth-brand">
     <div>
       <a class="brand" href="index.html">
-        <img src="assets/logo.svg" width="40" height="40" alt="Dayflow logo">
-        <span class="brand-word" style="color:#fff">Day<span style="color:#5eead4">flow</span></span>
+        <img src="assets/logo.svg" width="40" height="40" alt="Axiom logo">
+        <span class="brand-word" style="color:#fff">Axi<span style="color:#5eead4">om</span></span>
       </a>
       <h2>Welcome back to your workspace</h2>
       <p>Attendance, leave and payroll — one clean flow for every workday.</p>
@@ -34,7 +33,7 @@
     <div class="auth-card">
       <div class="mb-4">
         <h1>Sign in</h1>
-        <p class="text-muted-2 mb-0">Enter your credentials to access Dayflow.</p>
+        <p class="text-muted-2 mb-0">Enter your credentials to access Axiom.</p>
       </div>
 
       <!-- error / status message area -->
@@ -64,34 +63,17 @@
             </label>
             <a href="#" class="small-2" onclick="toast('Password reset will be handled by the backend API.', 'info'); return false;">Forgot password?</a>
           </div>
-          <button type="submit" class="btn btn-dayflow w-100" id="login-btn">Sign in</button>
-          
-          <div class="mt-4 text-center">
-            <p class="small text-muted-2 mb-2">Or sign in with</p>
-            <div id="g_id_onload"
-                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-                 data-callback="handleGoogleLogin"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin d-flex justify-content-center"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="sign_in_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left">
-            </div>
-          </div>
+          <button type="submit" class="btn btn-axiom w-100" id="login-btn">Sign in</button>
         </form>
       </div>
 
       <div class="demo-creds mt-3">
         <b>Demo accounts</b> (seeded in the database · password: <code>password123</code>)<br>
-        <span class="small-2">Employee:</span> <code>arjun@dayflow.com</code>
-        <button type="button" class="demo-fill-btn" onclick="fillDemo('arjun@dayflow.com')">fill</button>
+        <span class="small-2">Employee:</span> <code>arjun@axiom.com</code>
+        <button type="button" class="demo-fill-btn" onclick="fillDemo('arjun@axiom.com')">fill</button>
         &nbsp;·&nbsp;
-        <span class="small-2">HR:</span> <code>priya@dayflow.com</code>
-        <button type="button" class="demo-fill-btn" onclick="fillDemo('priya@dayflow.com')">fill</button>
+        <span class="small-2">HR:</span> <code>priya@axiom.com</code>
+        <button type="button" class="demo-fill-btn" onclick="fillDemo('priya@axiom.com')">fill</button>
         <div class="mt-2 small-2 text-muted-2">
           New accounts created on the <a href="signup.html">signup page</a> sign in immediately.
           <a href="#" class="small-2" onclick="resetDemo(event)">Clear offline demo cache</a>
@@ -99,7 +81,7 @@
       </div>
 
       <p class="text-center mt-4 mb-0 small-2 text-muted-2">
-        New to Dayflow? <a href="signup.html"><b>Create an account</b></a> · <a href="index.html">Back to home</a>
+        New to Axiom? <a href="signup.html"><b>Create an account</b></a> · <a href="index.html">Back to home</a>
       </p>
     </div>
   </div>

@@ -23,6 +23,7 @@ class Attendance(db.Model):
     status = db.Column(db.String(12), nullable=False, default="not-marked")
     check_in = db.Column(db.String(5), nullable=True)
     check_out = db.Column(db.String(5), nullable=True)
+    mood = db.Column(db.String(20), nullable=True)
 
     employee = db.relationship("Employee", back_populates="attendances")
 
@@ -37,4 +38,5 @@ class Attendance(db.Model):
             "status": self.status,
             "checkIn": self.check_in,
             "checkOut": self.check_out,
+            "mood": self.mood,
         }

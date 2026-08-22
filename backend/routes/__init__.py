@@ -10,6 +10,7 @@ def register_blueprints(app):
     from routes.leaves import leaves_bp
     from routes.payroll import payroll_bp
     from routes.reports import reports_bp
+    from routes.ai import ai_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(employees_bp)
@@ -19,3 +20,4 @@ def register_blueprints(app):
     app.register_blueprint(hr_bp)
     app.register_blueprint(activities_bp)
     app.register_blueprint(reports_bp)
+    app.register_blueprint(ai_bp)

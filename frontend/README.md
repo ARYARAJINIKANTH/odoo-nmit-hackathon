@@ -1,9 +1,9 @@
-# Dayflow — Human Resource Management System (HRMS)
+# Axiom — Human Resource Management System (HRMS)
 
 **Frontend-only build** for the *Odoo × NMIT Bangalore Hackathon 2026*.
-Problem statement: **DAYFLOW – Human Resource Management System (HRMS)**.
+Problem statement: **AXIOM – Human Resource Management System (HRMS)**.
 
-Dayflow is a clean, modern HRMS web frontend with two experiences:
+Axiom is a clean, modern HRMS web frontend with two experiences:
 
 | Role | What they get |
 |---|---|
@@ -20,7 +20,7 @@ Dayflow is a clean, modern HRMS web frontend with two experiences:
 ## 1. Project structure
 
 ```
-dayflow/
+axiom/
 ├── frontend/
 │   ├── index.html                 Landing page (branding, login/signup CTAs)
 │   ├── login.html                 Sign in (error area, remember me, demo creds)
@@ -33,7 +33,7 @@ dayflow/
 │   ├── leave.html                 Employee: apply + history · HR: approve/reject + comment
 │   ├── payroll.html               Employee: read-only payslips · HR: edit salary structures
 │   ├── css/
-│   │   └── style.css              Dayflow design system (on top of Bootstrap)
+│   │   └── style.css              Axiom design system (on top of Bootstrap)
 │   ├── js/
 │   │   ├── app.js                 Shared core: session, auth guards, sidebar/topbar shell,
 │   │   │                          toasts, modals, icons, formatters (NO data logic)
@@ -47,7 +47,7 @@ dayflow/
 │   │   │                          rejectLeave() (+ HR pending queue)
 │   │   └── payroll.js             loadPayroll() (read-only) + HR salary editing
 │   └── assets/
-│       ├── logo.svg               Dayflow logo
+│       ├── logo.svg               Axiom logo
 │       └── vendor/bootstrap.min.css  Bootstrap 5.3.3, downloaded locally → works offline
 └── README.md
 ```
@@ -77,8 +77,8 @@ index.html ──► login.html ──► employee-dashboard.html ──► prof
 
 | Role | Email | Password |
 |---|---|---|
-| Employee | `arjun@dayflow.com` | `password123` |
-| HR / Admin | `priya@dayflow.com` | `password123` |
+| Employee | `arjun@axiom.com` | `password123` |
+| HR / Admin | `priya@axiom.com` | `password123` |
 
 All seeded employees (`sneha@`, `rahul@`, `divya@`, `karthik@`) use the same password.
 Accounts created on the **signup page work immediately**. "Reset demo data" on the login

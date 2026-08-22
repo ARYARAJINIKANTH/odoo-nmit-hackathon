@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – employee.js  (employee-dashboard.html + profile.html)
+   AXIOM – employee.js  (employee-dashboard.html + profile.html)
    UI logic only — all data comes from the `api` object.
    ========================================================= */
 
@@ -42,13 +42,14 @@ async function loadTodayCard(employeeId) {
           <div><div class="th-time"><div class="tt-label">Worked</div><div class="tt-value">${workedHours(rec.checkIn, rec.checkOut) || '—'}</div></div></div>
         </div>
         <div class="d-flex gap-2" id="att-actions">
-          <button class="btn btn-dayflow btn-checkin" id="btn-checkin" ${rec.checkIn ? 'disabled' : ''}>${icon('clockIn', 17)} Check in</button>
-          <button class="btn btn-outline-dayflow btn-checkin" id="btn-checkout" ${!rec.checkIn || rec.checkOut ? 'disabled' : ''}>${icon('clockOut', 17)} Check out</button>
+          <button class="btn btn-axiom btn-checkin" id="btn-checkin" ${rec.checkIn ? 'disabled' : ''}>${icon('clockIn', 17)} Check in</button>
+          <button class="btn btn-outline-axiom btn-checkin" id="btn-checkout" ${!rec.checkIn || rec.checkOut ? 'disabled' : ''}>${icon('clockOut', 17)} Check out</button>
         </div>
       </div>`;
     document.getElementById('btn-checkin').onclick = () => checkIn(employeeId);
     document.getElementById('btn-checkout').onclick = () => checkOut(employeeId);
   } catch (e) {
+    document.getElementById('att-status-wrap').innerHTML = `<span class="badge-status" style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5">Error loading status</span>`;
     body.innerHTML = `<div class="alert df-alert df-error mb-0">${esc(e.message)}</div>`;
   }
 }
@@ -72,7 +73,7 @@ async function checkOut(employeeId) {
   const ok = await confirmAction({
     title: 'Check out for today?',
     body: '<p class="mb-0 text-muted-2">This will record your check-out time and end today\'s attendance. Under 4 worked hours is marked as a half day.</p>',
-    okText: 'Check out', okClass: 'btn-dayflow',
+    okText: 'Check out', okClass: 'btn-axiom',
   });
   if (!ok) return;
   const btn = document.getElementById('btn-checkout');
@@ -292,7 +293,7 @@ function enterContactEditMode(e) {
         </div>
       </div>
       <div class="d-flex gap-2 mt-3">
-        <button type="submit" class="btn btn-dayflow btn-sm" id="save-contact-btn">${icon('check', 14)} Save changes</button>
+        <button type="submit" class="btn btn-axiom btn-sm" id="save-contact-btn">${icon('check', 14)} Save changes</button>
         <button type="button" class="btn btn-ghost btn-sm" id="cancel-contact-btn">Cancel</button>
       </div>
     </form>`;

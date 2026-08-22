@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – payroll.js  (payroll.html)
+   AXIOM – payroll.js  (payroll.html)
    EMPLOYEE: read-only structure + payslips | HR: manage all.
    UI logic only — all data comes from the `api` object.
    ========================================================= */
@@ -87,7 +87,7 @@ function viewPayslip(ps) {
       <div class="payslip">
         <div class="ps-head">
           <img src="assets/logo.svg" width="34" height="34" alt="">
-          <h4 class="mt-2 mb-0">Dayflow Technologies Pvt. Ltd.</h4>
+          <h4 class="mt-2 mb-0">Axiom Technologies Pvt. Ltd.</h4>
           <div class="text-muted-2 small-2">Payslip for ${monthLabel(ps.month)} · ${esc(PAY_SESSION.name)} (${esc(PAY_SESSION.employeeId)})</div>
         </div>
         <div class="row g-4">
@@ -110,7 +110,7 @@ function viewPayslip(ps) {
           </div>
         </div>
         <div class="d-flex justify-content-between ps-net"><span>NET PAY</span><span>${fmtMoney(ps.net)}</span></div>
-        <button class="btn btn-dayflow w-100 mt-3" onclick="api.downloadPayslip('${PAY_SESSION.employeeId}', '${ps.month}')">${icon('download', 14)} Download PDF</button>
+        <button class="btn btn-axiom w-100 mt-3" onclick="api.downloadPayslip('${PAY_SESSION.employeeId}', '${ps.month}')">${icon('download', 14)} Download PDF</button>
       </div>`,
     okText: 'Close', showCancel: false, large: true,
   });
@@ -194,7 +194,7 @@ async function editSalary(employeeId, row) {
       const okGo = await confirmAction({
         title: 'Save this salary structure?',
         body: `<p class="mb-2 text-muted-2">New net salary for <b>${esc(row.name)}</b>:</p><h4 style="color:var(--df-primary)">${fmtMoney(newNet)}</h4><p class="mb-0 text-muted-2 small-2">Previous net: ${fmtMoney(row.net)}</p>`,
-        okText: 'Yes, save', okClass: 'btn-dayflow',
+        okText: 'Yes, save', okClass: 'btn-axiom',
       });
       if (!okGo) return true;
       try {
