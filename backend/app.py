@@ -1,4 +1,4 @@
-"""Dayflow Flask application factory."""
+"""Axiom Flask application factory."""
 import os
 
 from flask import Flask, jsonify
@@ -25,7 +25,7 @@ def create_app(config_name: str | None = None) -> Flask:
 
     @app.get("/api/health")
     def health():
-        return jsonify({"status": "ok", "service": "dayflow-api"})
+        return jsonify({"status": "ok", "service": "axiom-api"})
 
     # ---- consistent JSON errors (frontend reads `message`) ----
     @app.errorhandler(ApiError)

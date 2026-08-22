@@ -18,10 +18,11 @@ hr_bp = Blueprint("hr", __name__, url_prefix="/api/hr")
 
 
 def _day_rows(day: date):
-    """(employee, status) for everyone on `day`, synthesising missing rows."""
-    existing = {a.employee_id: a.status for a in Attendance.query.filter_by(date=day).all()}
+    """(employee, status, mood) for everyone on `day`, synthesising missing rows."""
+    existing = {a.employee_id: (a.status, a.mood) for a in Attendance.query.filter_by(date=day).all()}
     for employee in Employee.query.all():
-        yield employee, existing.get(employee.id, Attendance.default_status_for(day))
+        status, mood = existing.get(employee.id, (Attendance.default_status_for(day), None))
+        yield employee, status, mood
 
 
 @hr_bp.get("/stats")
@@ -30,10 +31,13 @@ def stats():
     today = date.today()
 
     counts = {"present": 0, "absent": 0, "half-day": 0, "leave": 0, "not-marked": 0, "weekoff": 0}
+    mood_counts = {}
     monthly_payroll = 0
     dept_map = {}
-    for employee, status in _day_rows(today):
+    for employee, status, mood in _day_rows(today):
         counts[status] = counts.get(status, 0) + 1
+        if mood:
+            mood_counts[mood] = mood_counts.get(mood, 0) + 1
         monthly_payroll += employee.net_salary()
         dept = dept_map.setdefault(employee.department, {"name": employee.department, "total": 0, "present": 0})
         dept["total"] += 1
@@ -46,7 +50,7 @@ def stats():
     day_labels = "MTWTFSS"  # Mon..Sun single letters
     for offset in range(6, -1, -1):
         day = today - timedelta(days=offset)
-        rows = [status for _, status in _day_rows(day)]
+        rows = [status for _, status, _ in _day_rows(day)]
         working = [s for s in rows if s != "weekoff"]
         presentish = sum(1 for s in working if s in ("present", "half-day"))
         pct = round(presentish / len(working) * 100) if working else 0
@@ -55,6 +59,7 @@ def stats():
     return jsonify({
         "totalEmployees": Employee.query.count(),
         "counts": counts,
+        "moodCounts": mood_counts,
         "pendingLeaves": Leave.query.filter_by(status="pending").count(),
         "monthlyPayroll": monthly_payroll,
         "departments": departments,

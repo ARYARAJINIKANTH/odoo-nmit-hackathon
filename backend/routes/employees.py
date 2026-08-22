@@ -107,7 +107,7 @@ def add_employee():
 
     log_activity("user", f"HR added new employee <b>{name}</b> to {employee.department}.")
     db.session.flush()
-    notify(user, "user", "Welcome to Dayflow! Your account was created by HR.")
+    notify(user, "user", "Welcome to Axiom! Your account was created by HR.")
     db.session.commit()
 
     return jsonify(employee.to_dict(include_documents=True)), 201

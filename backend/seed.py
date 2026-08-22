@@ -1,4 +1,4 @@
-"""Seed the Dayflow database with realistic demo data.
+"""Seed the Axiom database with realistic demo data.
 
 Mirrors the frontend's built-in mock dataset (same people, salaries, leave
 requests and activity feed) so the switch mock -> real API is seamless.
@@ -23,10 +23,10 @@ DEMO_PASSWORD = "password123"
 
 DEMO_EMPLOYEES = [
     # (id, name, email, role, department, position, joinDate, phone, address, salary)
-    ("E-1001", "Priya Sharma", "priya@dayflow.com", "hr", "People Ops", "HR Manager",
+    ("E-1001", "Priya Sharma", "priya@axiom.com", "hr", "People Ops", "HR Manager",
      "2021-06-14", "+91 98400 11223", "12 Anna Nagar, Chennai",
      dict(basic=45000, hra=18000, transport=3200, special=9500, pf=5400, pt=200, insurance=1500)),
-    ("E-1002", "Arjun Mehta", "arjun@dayflow.com", "employee", "Engineering", "Software Engineer",
+    ("E-1002", "Arjun Mehta", "arjun@axiom.com", "employee", "Engineering", "Software Engineer",
      "2023-02-01", "+91 99020 44556", "44 MG Road, Bengaluru",
      dict(basic=38000, hra=15200, transport=2400, special=7000, pf=4560, pt=200, insurance=1250)),
 
@@ -62,10 +62,13 @@ def generate_attendance_history(employee_id: str, days: int = 35) -> None:
             db.session.add(Attendance(employee_id=employee_id, date=day, status="weekoff"))
             continue
         roll = rng.random()
+        mood = None
         if roll < 0.80:
-            rec = dict(status="present", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 17, 18, 40, 59))
+            mood = rng.choice(["🤩", "🙂", "🙂", "😐", "😕", "😫"])
+            rec = dict(status="present", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 17, 18, 40, 59), mood=mood)
         elif roll < 0.87:
-            rec = dict(status="half-day", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 13, 14, 0, 30))
+            mood = rng.choice(["😐", "😕", "😫"])
+            rec = dict(status="half-day", check_in=_rand_time(rng, 8, 9, 45, 59), check_out=_rand_time(rng, 13, 14, 0, 30), mood=mood)
         elif roll < 0.94:
             rec = dict(status="absent", check_in=None, check_out=None)
         else:
@@ -97,8 +100,8 @@ def seed_demo_data(verbose: bool = True) -> None:
 
     if verbose:
         print("✔ Seeded demo data:")
-        print(f"  HR/Admin  → priya@dayflow.com / {DEMO_PASSWORD}")
-        print(f"  Employee  → arjun@dayflow.com / {DEMO_PASSWORD}")
+        print(f"  HR/Admin  → priya@axiom.com / {DEMO_PASSWORD}")
+        print(f"  Employee  → arjun@axiom.com / {DEMO_PASSWORD}")
         print(f"  ({len(DEMO_EMPLOYEES)} employees, attendance history, leaves, payslips, activities)")
 
 
