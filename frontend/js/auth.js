@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – auth.js  (login.html + signup.html)
+   AXIOM – auth.js  (login.html + signup.html)
    ========================================================= */
 
 /* ---------- shared ---------- */
@@ -65,27 +65,6 @@ async function loginUser() {
   }
 }
 
-async function handleGoogleLogin(response) {
-  const errBox = document.getElementById('login-error');
-  const btn = document.getElementById('login-btn');
-  const remember = document.getElementById('remember') ? document.getElementById('remember').checked : true;
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span>Signing in with Google…';
-  setFormError(errBox, '');
-
-  try {
-    const session = await api.googleLogin(response.credential);
-    setSession(session, remember);
-    const params = new URLSearchParams(location.search);
-    const next = params.get('next');
-    location.replace(next || (session.role === 'hr' ? 'hr-dashboard.html' : 'employee-dashboard.html'));
-  } catch (e) {
-    setFormError(errBox, esc(e.message));
-    btn.disabled = false;
-    btn.textContent = 'Sign in';
-  }
-}
 
 /* signup page ------------------------------------------------ */
 /**
@@ -93,7 +72,7 @@ async function handleGoogleLogin(response) {
  * Frontend validation first, then api.signup()
  * (mock now → POST /api/auth/signup later).
  */
-let CURRENT_OTP_PAYLOAD = null;
+let CURRENT_SIGNUP_PAYLOAD = null;
 
 async function signupUser() {
   const form = document.getElementById('signup-form');
@@ -120,41 +99,42 @@ async function signupUser() {
   if (!form.checkValidity()) { setFormError(errBox, ''); return; }
   if (!role) { setFormError(errBox, 'Please select a role.'); return; }
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span>Sending OTP…';
-  setFormError(errBox, '');
-
-  try {
-    await api.sendOTP(email); // --> POST /api/auth/send-otp
-    CURRENT_OTP_PAYLOAD = { employeeId, name, email, password, role };
-    
-    // Show OTP section
-    document.getElementById('otp-section').style.display = 'block';
+  // If HR, show the key dialog step
+  if (role === 'hr') {
+    CURRENT_SIGNUP_PAYLOAD = { employeeId, name, email, password, role };
+    document.getElementById('hr-key-section').style.display = 'block';
     document.getElementById('signup-btn').style.display = 'none';
-    document.getElementById('google-signup-section').style.display = 'none';
-    
-    // Make form fields readonly while OTP is active
     ['employeeId', 'name', 'semail', 'spassword', 'confirm', 'role'].forEach(id => {
       document.getElementById(id).disabled = true;
     });
-    
+    return;
+  }
+
+  // If Employee, proceed directly
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Creating account…';
+  setFormError(errBox, '');
+
+  try {
+    await api.signup({ employeeId, name, email, password, role }); // --> POST /api/auth/signup
+    toast('Account created. Please sign in.', 'success', 'Welcome to Axiom');
+    if (typeof confetti !== 'undefined') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    setTimeout(() => location.replace('login.html?registered=' + encodeURIComponent(email)), 1500);
   } catch (e) {
     setFormError(errBox, esc(e.message));
-  } finally {
     btn.disabled = false;
-    btn.textContent = 'Verify Email';
+    btn.textContent = 'Create account';
   }
 }
 
-async function completeSignup() {
-  if (!CURRENT_OTP_PAYLOAD) return;
+async function completeHrSignup() {
+  if (!CURRENT_SIGNUP_PAYLOAD) return;
   const errBox = document.getElementById('signup-error');
-  const btn = document.getElementById('complete-signup-btn');
-  const otpInput = document.getElementById('otp-input');
-  const otp = otpInput.value.trim();
+  const btn = document.getElementById('complete-hr-signup-btn');
+  const companyKey = document.getElementById('companyKey').value.trim();
   
-  if (otp.length !== 6) {
-    setFormError(errBox, 'Please enter the 6-digit OTP.');
+  if (!companyKey) {
+    setFormError(errBox, 'Please enter the Company Key.');
     return;
   }
   
@@ -163,22 +143,22 @@ async function completeSignup() {
   setFormError(errBox, '');
 
   try {
-    await api.signup({ ...CURRENT_OTP_PAYLOAD, otp }); // --> POST /api/auth/signup
-    toast('Account created. Please sign in.', 'success', 'Welcome to Dayflow');
-    location.replace('login.html?registered=' + encodeURIComponent(CURRENT_OTP_PAYLOAD.email));
+    await api.signup({ ...CURRENT_SIGNUP_PAYLOAD, companyKey }); // --> POST /api/auth/signup
+    toast('Account created. Please sign in.', 'success', 'Welcome to Axiom');
+    if (typeof confetti !== 'undefined') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    setTimeout(() => location.replace('login.html?registered=' + encodeURIComponent(CURRENT_SIGNUP_PAYLOAD.email)), 1500);
   } catch (e) {
     setFormError(errBox, esc(e.message));
     btn.disabled = false;
-    btn.textContent = 'Verify & Create account';
+    btn.textContent = 'Verify Key & Create account';
   }
 }
 
-function cancelOTP() {
-  CURRENT_OTP_PAYLOAD = null;
-  document.getElementById('otp-section').style.display = 'none';
+function cancelHrKey() {
+  CURRENT_SIGNUP_PAYLOAD = null;
+  document.getElementById('hr-key-section').style.display = 'none';
   document.getElementById('signup-btn').style.display = 'block';
-  document.getElementById('google-signup-section').style.display = 'block';
-  document.getElementById('otp-input').value = '';
+  document.getElementById('companyKey').value = '';
   document.getElementById('signup-error').style.display = 'none';
   
   ['employeeId', 'name', 'semail', 'spassword', 'confirm', 'role'].forEach(id => {
@@ -186,38 +166,6 @@ function cancelOTP() {
   });
 }
 
-async function handleGoogleSignup(response) {
-  const form = document.getElementById('signup-form');
-  const errBox = document.getElementById('signup-error');
-  const btn = document.getElementById('signup-btn');
-
-  const employeeId = document.getElementById('employeeId').value.trim();
-  const name = document.getElementById('name').value.trim();
-  const role = document.getElementById('role').value;
-
-  form.classList.add('was-validated');
-
-  const empInput = document.getElementById('employeeId');
-  
-  if (!empInput.checkValidity() || !role) {
-    setFormError(errBox, 'Please provide a valid Employee ID and select a Role before signing up with Google.');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span>Creating account via Google…';
-  setFormError(errBox, '');
-
-  try {
-    await api.googleSignup({ employeeId, name, role, credential: response.credential });
-    toast('Account created with Google. Please sign in.', 'success', 'Welcome to Dayflow');
-    location.replace('login.html?registered=' + encodeURIComponent("Google Account"));
-  } catch (e) {
-    setFormError(errBox, esc(e.message));
-    btn.disabled = false;
-    btn.textContent = 'Create account';
-  }
-}
 
 /* ---------- wire up (login vs signup page) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -249,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const p = document.getElementById('spassword');
       p.type = p.type === 'password' ? 'text' : 'password';
     };
-    document.getElementById('complete-signup-btn').onclick = completeSignup;
-    document.getElementById('cancel-otp-btn').onclick = cancelOTP;
+    
+    document.getElementById('complete-hr-signup-btn').onclick = completeHrSignup;
+    document.getElementById('cancel-hr-key-btn').onclick = cancelHrKey;
   }
 });

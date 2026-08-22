@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – attendance.js  (attendance.html)
+   AXIOM – attendance.js  (attendance.html)
    Renders EMPLOYEE view or HR view based on the session role.
    UI logic only — all data comes from the `api` object.
    ========================================================= */
@@ -70,8 +70,8 @@ async function loadTodayHero(employeeId) {
         </div>
       </div>
       <div class="th-actions">
-        <button class="btn btn-dayflow btn-checkin" id="att-btn-in" ${rec.checkIn ? 'disabled' : ''}>${icon('clockIn', 18)} Check in</button>
-        <button class="btn btn-outline-dayflow btn-checkin" id="att-btn-out" ${!rec.checkIn || rec.checkOut ? 'disabled' : ''}>${icon('clockOut', 18)} Check out</button>
+        <button class="btn btn-axiom btn-checkin" id="att-btn-in" ${rec.checkIn ? 'disabled' : ''}>${icon('clockIn', 18)} Check in</button>
+        <button class="btn btn-outline-axiom btn-checkin" id="att-btn-out" ${!rec.checkIn || rec.checkOut ? 'disabled' : ''}>${icon('clockOut', 18)} Check out</button>
       </div>`;
     document.getElementById('att-btn-in').onclick = () => doCheckIn(employeeId);
     document.getElementById('att-btn-out').onclick = () => doCheckOut(employeeId);
@@ -81,10 +81,46 @@ async function loadTodayHero(employeeId) {
 }
 
 async function doCheckIn(employeeId) {
+  let mood = '🙂';
+  const confirmed = await new Promise(resolve => {
+    const back = openFormModal({
+      title: 'Vibe Check 🌟',
+      body: `
+        <p class="text-muted-2 mb-3">How are you feeling today? (HR cares!)</p>
+        <div class="d-flex justify-content-around mb-2" id="vibe-selector">
+           <div class="vibe-btn" data-val="🤩" style="font-size:2.5rem;cursor:pointer;opacity:0.5;transition:0.2s">🤩</div>
+           <div class="vibe-btn active" data-val="🙂" style="font-size:2.5rem;cursor:pointer;opacity:1;transform:scale(1.2);transition:0.2s">🙂</div>
+           <div class="vibe-btn" data-val="😐" style="font-size:2.5rem;cursor:pointer;opacity:0.5;transition:0.2s">😐</div>
+           <div class="vibe-btn" data-val="😕" style="font-size:2.5rem;cursor:pointer;opacity:0.5;transition:0.2s">😕</div>
+           <div class="vibe-btn" data-val="😫" style="font-size:2.5rem;cursor:pointer;opacity:0.5;transition:0.2s">😫</div>
+        </div>
+      `,
+      okText: 'Check In',
+      onOk: () => { resolve(true); return true; }
+    });
+    
+    back.querySelector('[data-act="cancel"]').addEventListener('click', () => resolve(false));
+    back.querySelector('.modal-x').addEventListener('click', () => resolve(false));
+    back.addEventListener('mousedown', e => { if (e.target === back) resolve(false); });
+
+    back.querySelectorAll('.vibe-btn').forEach(btn => {
+      btn.onclick = () => {
+        mood = btn.dataset.val;
+        back.querySelectorAll('.vibe-btn').forEach(b => {
+          b.style.opacity = '0.5'; b.style.transform = 'scale(1)';
+        });
+        btn.style.opacity = '1'; btn.style.transform = 'scale(1.2)';
+      };
+    });
+  });
+
+  if (!confirmed) return;
+
   const btn = document.getElementById('att-btn-in');
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Checking in…';
   try {
-    const rec = await api.checkIn(employeeId); // --> POST /api/attendance/check-in
+    const rec = await api.checkIn(employeeId, mood); // --> POST /api/attendance/check-in
+    if (typeof confetti !== 'undefined') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
     toast(`Checked in at ${rec.checkIn}.`, 'success', 'Checked in');
     loadTodayHero(employeeId);
   } catch (e) { toast(e.message, 'error'); btn.disabled = false; btn.innerHTML = `${icon('clockIn', 18)} Check in`; }
@@ -154,11 +190,14 @@ async function loadHistory(employeeId) {
     const rows = (await api.getAttendance(employeeId, from, to)).filter(r => r.status !== 'weekoff');
     const counts = { present: 0, absent: 0, 'half-day': 0, leave: 0 };
     rows.forEach(r => counts[r.status] !== undefined && counts[r.status]++);
-    summary.innerHTML = `<div class="chip-row py-2">
-      <span class="chip" style="border-color:#bbf7d0">Present <span class="chip-num">${counts.present}</span></span>
-      <span class="chip" style="border-color:#fecaca">Absent <span class="chip-num">${counts.absent}</span></span>
-      <span class="chip" style="border-color:#fde68a">Half-day <span class="chip-num">${counts['half-day']}</span></span>
-      <span class="chip" style="border-color:#ddd6fe">Leave <span class="chip-num">${counts.leave}</span></span>
+    summary.innerHTML = `<div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2">
+      <div class="chip-row">
+        <span class="chip" style="border-color:#bbf7d0">Present <span class="chip-num">${counts.present}</span></span>
+        <span class="chip" style="border-color:#fecaca">Absent <span class="chip-num">${counts.absent}</span></span>
+        <span class="chip" style="border-color:#fde68a">Half-day <span class="chip-num">${counts['half-day']}</span></span>
+        <span class="chip" style="border-color:#ddd6fe">Leave <span class="chip-num">${counts.leave}</span></span>
+      </div>
+      <button class="btn btn-axiom btn-sm" onclick="api.downloadAttendance('${employeeId}', '${month}')">${icon('download', 14)} PDF Report</button>
     </div>`;
     if (!rows.length) { body.innerHTML = emptyState('No records this month', 'Attendance will appear here once recorded.'); return; }
     body.innerHTML = `<div class="table-responsive"><table class="table df-table">

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dayflow — HRMS for modern teams</title>
-  <meta name="description" content="Dayflow is a clean, modern HRMS for attendance, leave management and payroll.">
+  <title>Axiom — HRMS for modern teams</title>
+  <meta name="description" content="Axiom is a clean, modern HRMS for attendance, leave management and payroll.">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <link rel="stylesheet" href="css/style.css">
@@ -15,12 +15,12 @@
 <nav class="landing-nav">
   <div class="ln-inner">
     <a class="brand" href="index.html">
-      <img src="assets/logo.svg" width="36" height="36" alt="Dayflow logo">
-      <span class="brand-word">Day<span class="accent">flow</span></span>
+      <img src="assets/logo.svg" width="36" height="36" alt="Axiom logo">
+      <span class="brand-word">Axi<span class="accent">om</span></span>
     </a>
     <div class="ms-auto d-flex gap-2">
       <a href="login.html" class="btn btn-ghost">Sign in</a>
-      <a href="signup.html" class="btn btn-dayflow">Get started</a>
+      <a href="signup.html" class="btn btn-axiom">Get started</a>
     </div>
   </div>
 </nav>
@@ -29,17 +29,17 @@
 <header class="hero">
   <div class="hero-inner">
     <div>
-      <span class="chip mb-3" style="background:#fff">✨ Odoo × NMIT Hackathon 2026 · Problem Statement: DAYFLOW HRMS</span>
+      <span class="chip mb-3" style="background:#fff">✨ Odoo × NMIT Hackathon 2026 · Problem Statement: AXIOM HRMS</span>
       <h1>Every workday,<br><span class="grad">in one clean flow.</span></h1>
-      <p class="lead-x mt-3">Dayflow is a modern Human Resource Management System that keeps attendance, leave and payroll effortless — for employees and HR alike.</p>
+      <p class="lead-x mt-3">Axiom is a modern Human Resource Management System that keeps attendance, leave and payroll effortless — for employees and HR alike.</p>
       <div class="hero-cta">
-        <a href="login.html" class="btn btn-dayflow">
+        <a href="login.html" class="btn btn-axiom">
           Sign in to your workspace
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         </a>
-        <a href="signup.html" class="btn btn-outline-dayflow">Create an account</a>
+        <a href="signup.html" class="btn btn-outline-axiom">Create an account</a>
       </div>
-      <p class="form-hint mt-3">Demo logins: <b>arjun@dayflow.com</b> (employee) · <b>priya@dayflow.com</b> (HR) · password <b>password123</b></p>
+      <p class="form-hint mt-3">Demo logins: <b>arjun@axiom.com</b> (employee) · <b>priya@axiom.com</b> (HR) · password <b>password123</b></p>
     </div>
 
     <!-- product mock (pure CSS) -->
@@ -80,7 +80,7 @@
   <div class="section-head">
     <div class="kicker">Everything HR, simplified</div>
     <h2>One system for the whole workday</h2>
-    <p>Dayflow replaces spreadsheets and scattered tools with a single, clear workspace.</p>
+    <p>Axiom replaces spreadsheets and scattered tools with a single, clear workspace.</p>
   </div>
   <div class="feature-grid">
     <div class="feature-card">
@@ -144,7 +144,7 @@
         <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Read-only payslips — no surprises</li>
         <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Edit only your phone, address &amp; photo</li>
       </ul>
-      <a href="signup.html" class="btn btn-outline-dayflow mt-3">Join as Employee</a>
+      <a href="signup.html" class="btn btn-outline-axiom mt-3">Join as Employee</a>
     </div>
     <div class="role-card hr-card">
       <span class="badge-role hr" style="background:rgba(45,212,191,.15);color:#5eead4">HR / ADMIN</span>
@@ -165,7 +165,7 @@
   <div class="lf-inner">
     <a class="brand" href="index.html">
       <img src="assets/logo.svg" width="28" height="28" alt="">
-      <span class="brand-word" style="color:#fff;font-size:1rem">Day<span style="color:#5eead4">flow</span></span>
+      <span class="brand-word" style="color:#fff;font-size:1rem">Axi<span style="color:#5eead4">om</span></span>
     </a>
     <span>HRMS · Attendance · Leave · Payroll</span>
     <span>Odoo × NMIT Bangalore Hackathon 2026</span>
@@ -180,7 +180,7 @@
     const s = getSession();
     if (s) document.querySelectorAll('a[href="login.html"]').forEach(a => {
       a.href = s.role === 'hr' ? 'hr-dashboard.html' : 'employee-dashboard.html';
-      a.textContent = a.classList.contains('btn-dayflow') ? 'Open your dashboard' : 'Go to dashboard';
+      a.textContent = a.classList.contains('btn-axiom') ? 'Open your dashboard' : 'Go to dashboard';
     });
   });
 </script>

@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – leave.js  (leave.html)
+   AXIOM – leave.js  (leave.html)
    EMPLOYEE: apply + history | HR: approve / reject + comment.
    UI logic only — all data comes from the `api` object.
    ========================================================= */
@@ -240,7 +240,10 @@ async function decideLeave(id, decision) {
   });
   if (!res.confirmed) return;
   try {
-    if (decision === 'approved') await approveLeave(id, res.comment);
+    if (decision === 'approved') {
+      await approveLeave(id, res.comment);
+      if (typeof confetti !== 'undefined') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    }
     else await rejectLeave(id, res.comment);
     toast(`Request ${id} ${decision}.`, 'success', 'Decision saved');
     loadAllLeaveRequests();
@@ -257,7 +260,7 @@ async function commentOnly(id) {
     title: 'Add a comment',
     body: '<p class="mb-0 text-muted-2">In the integrated version this sends a notification to the employee via the API.</p>',
     commentField: 'Your comment',
-    okText: 'Send comment', okClass: 'btn-dayflow',
+    okText: 'Send comment', okClass: 'btn-axiom',
   });
   if (!res.confirmed) return;
   toast('Comment queued — will be delivered by the notifications API.', 'info', 'Demo note');

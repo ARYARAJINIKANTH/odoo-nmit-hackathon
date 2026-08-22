@@ -1,5 +1,5 @@
 /* =========================================================
-   DAYFLOW – api.js  (THE ONLY file that touches data)
+   AXIOM – api.js  (THE ONLY file that touches data)
    ---------------------------------------------------------
    Every page script calls functions on this `api` object.
    NORMAL MODE = REAL API → Flask REST → SQLite database.
@@ -8,7 +8,7 @@
      • API_CONFIG.useMock  → false by default (USE_MOCK_DATA=false)
      • Explicit opt-in for offline development ONLY:
          - add ?mock to any page URL, or
-         - localStorage.dayflow_use_mock = '1'
+         - localStorage.axiom_use_mock = '1'
        (and ?api / '0' force real-API mode)
 
    There is NO silent fallback: if the backend is unreachable the
@@ -26,7 +26,7 @@ function resolveUseMock() {
     const params = new URLSearchParams(location.search);
     if (params.has('mock')) return true;
     if (params.has('api')) return false;
-    const stored = Storage.get('dayflow_use_mock');
+    const stored = Storage.get('axiom_use_mock');
     if (stored === '1') return true;
     if (stored === '0') return false;
   } catch (e) { /* ignore */ }
@@ -35,7 +35,7 @@ function resolveUseMock() {
 const USE_MOCK_DATA = resolveUseMock();
 
 /* ---------- session token (sent as Bearer on every request) ---------- */
-function getSessionToken() { try { return (JSON.parse(Storage.get('dayflow_session') || 'null') || {}).token; } catch (e) { return null; } }
+function getSessionToken() { try { return (JSON.parse(Storage.get('axiom_session') || 'null') || {}).token; } catch (e) { return null; } }
 
 /* status-code → user-facing message (used when the server sends no message) */
 function apiErrorText(status) {
@@ -84,9 +84,9 @@ async function request(method, path, body) {
 /* =========================================================================
    MOCK DATA SECTION — OFFLINE DEV TOOL, never used in normal operation.
    Only active when explicitly enabled (?mock URL param or
-   localStorage.dayflow_use_mock = '1'). The real backend is the default.
+   localStorage.axiom_use_mock = '1'). The real backend is the default.
    ========================================================================= */
-const MOCK_DB_KEY = 'dayflow_mock_db_v1';
+const MOCK_DB_KEY = 'axiom_mock_db_v1';
 const MOCK_DELAY = 380; // simulate network latency so loading states are visible
 
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -112,12 +112,12 @@ function leaveDaysBetween(from, to) { // inclusive, Sundays excluded
 
 function seedDB() {
   const employees = [
-    { id: 'E-1001', name: 'Priya Sharma',  email: 'priya@dayflow.com',  role: 'hr',       department: 'People Ops',  position: 'HR Manager',         joinDate: '2021-06-14', phone: '+91 98400 11223', address: '12 Anna Nagar, Chennai', salary: { basic: 45000, hra: 18000, transport: 3200, special: 9500, pf: 5400, pt: 200, insurance: 1500 } },
-    { id: 'E-1002', name: 'Arjun Mehta',   email: 'arjun@dayflow.com',  role: 'employee', department: 'Engineering', position: 'Software Engineer',   joinDate: '2023-02-01', phone: '+91 99020 44556', address: '44 MG Road, Bengaluru', salary: { basic: 38000, hra: 15200, transport: 2400, special: 7000, pf: 4560, pt: 200, insurance: 1250 } },
-    { id: 'E-1003', name: 'Sneha Iyer',    email: 'sneha@dayflow.com',  role: 'employee', department: 'Engineering', position: 'QA Engineer',         joinDate: '2023-08-21', phone: '+91 98410 77889', address: '8 T Nagar, Chennai',     salary: { basic: 32000, hra: 12800, transport: 2400, special: 5200, pf: 3840, pt: 200, insurance: 1250 } },
-    { id: 'E-1004', name: 'Rahul Verma',   email: 'rahul@dayflow.com',  role: 'employee', department: 'Sales',       position: 'Sales Executive',     joinDate: '2022-11-07', phone: '+91 90030 12345', address: '21 Jubilee Hills, Hyderabad', salary: { basic: 28000, hra: 11200, transport: 2400, special: 4500, pf: 3360, pt: 200, insurance: 1250 } },
-    { id: 'E-1005', name: 'Divya Nair',    email: 'divya@dayflow.com',  role: 'employee', department: 'Finance',     position: 'Accountant',          joinDate: '2022-04-19', phone: '+91 97440 33445', address: '5 Kaloor, Kochi',        salary: { basic: 30000, hra: 12000, transport: 2400, special: 5000, pf: 3600, pt: 200, insurance: 1250 } },
-    { id: 'E-1006', name: 'Karthik Raj',   email: 'karthik@dayflow.com',role: 'employee', department: 'Engineering', position: 'Frontend Developer',  joinDate: '2024-01-08', phone: '+91 96550 66778', address: '17 K K Nagar, Chennai',  salary: { basic: 36000, hra: 14400, transport: 2400, special: 6200, pf: 4320, pt: 200, insurance: 1250 } },
+    { id: 'E-1001', name: 'Priya Sharma',  email: 'priya@axiom.com',  role: 'hr',       department: 'People Ops',  position: 'HR Manager',         joinDate: '2021-06-14', phone: '+91 98400 11223', address: '12 Anna Nagar, Chennai', salary: { basic: 45000, hra: 18000, transport: 3200, special: 9500, pf: 5400, pt: 200, insurance: 1500 } },
+    { id: 'E-1002', name: 'Arjun Mehta',   email: 'arjun@axiom.com',  role: 'employee', department: 'Engineering', position: 'Software Engineer',   joinDate: '2023-02-01', phone: '+91 99020 44556', address: '44 MG Road, Bengaluru', salary: { basic: 38000, hra: 15200, transport: 2400, special: 7000, pf: 4560, pt: 200, insurance: 1250 } },
+    { id: 'E-1003', name: 'Sneha Iyer',    email: 'sneha@axiom.com',  role: 'employee', department: 'Engineering', position: 'QA Engineer',         joinDate: '2023-08-21', phone: '+91 98410 77889', address: '8 T Nagar, Chennai',     salary: { basic: 32000, hra: 12800, transport: 2400, special: 5200, pf: 3840, pt: 200, insurance: 1250 } },
+    { id: 'E-1004', name: 'Rahul Verma',   email: 'rahul@axiom.com',  role: 'employee', department: 'Sales',       position: 'Sales Executive',     joinDate: '2022-11-07', phone: '+91 90030 12345', address: '21 Jubilee Hills, Hyderabad', salary: { basic: 28000, hra: 11200, transport: 2400, special: 4500, pf: 3360, pt: 200, insurance: 1250 } },
+    { id: 'E-1005', name: 'Divya Nair',    email: 'divya@axiom.com',  role: 'employee', department: 'Finance',     position: 'Accountant',          joinDate: '2022-04-19', phone: '+91 97440 33445', address: '5 Kaloor, Kochi',        salary: { basic: 30000, hra: 12000, transport: 2400, special: 5000, pf: 3600, pt: 200, insurance: 1250 } },
+    { id: 'E-1006', name: 'Karthik Raj',   email: 'karthik@axiom.com',role: 'employee', department: 'Engineering', position: 'Frontend Developer',  joinDate: '2024-01-08', phone: '+91 96550 66778', address: '17 K K Nagar, Chennai',  salary: { basic: 36000, hra: 14400, transport: 2400, special: 6200, pf: 4320, pt: 200, insurance: 1250 } },
   ].map(e => ({ ...e, photo: null, documents: [
     { name: 'Offer Letter.pdf', size: '240 KB' },
     { name: 'ID Proof.pdf', size: '1.1 MB' },
@@ -202,8 +202,9 @@ const mock = {
     return { token: mockToken(), employeeId: u.employeeId, name: emp.name, email: emp.email, role: u.role, photo: emp.photo };
   },
 
-  async signup({ employeeId, name, email, password, role }) {
+  async signup({ employeeId, name, email, password, role, companyKey }) {
     await wait();
+    if (role === 'hr' && companyKey !== 'A NEW HR') throw new Error('Invalid Company Key.');
     const db = loadDB();
     if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) throw new Error('An account with this email already exists.');
     if (db.employees.some(e => e.id.toLowerCase() === employeeId.toLowerCase())) throw new Error('This Employee ID is already registered.');
@@ -258,7 +259,7 @@ const mock = {
     return clone(rec);
   },
 
-  async checkIn(employeeId) {
+  async checkIn(employeeId, mood) {
     await wait();
     await mock.getTodayAttendance(employeeId); // ensure the record exists
     const date = toISODate(new Date());
@@ -268,7 +269,8 @@ const mock = {
     const now = new Date();
     r.checkIn = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     r.status = 'present';
-    logActivity('clockIn', `<b>${dbEmployee(employeeId).name}</b> checked in at ${r.checkIn}.`);
+    r.mood = mood;
+    logActivity('clockIn', `<b>${dbEmployee(employeeId).name}</b> checked in at ${r.checkIn}${mood ? ' (Mood: ' + mood + ')' : ''}.`);
     saveDB();
     return clone(r);
   },
@@ -414,7 +416,11 @@ const mock = {
     const today = toISODate(new Date());
     const todays = db.attendance.filter(a => a.date === today);
     const counts = { present: 0, absent: 0, 'half-day': 0, leave: 0, 'not-marked': 0, weekoff: 0 };
-    todays.forEach(a => counts[a.status] = (counts[a.status] || 0) + 1);
+    const moodCounts = {};
+    todays.forEach(a => {
+      counts[a.status] = (counts[a.status] || 0) + 1;
+      if (a.mood) moodCounts[a.mood] = (moodCounts[a.mood] || 0) + 1;
+    });
     const monthlyPayroll = db.employees.reduce((s, e) => s + payStructNet(e.salary), 0);
     const trend = [];
     for (let off = 6; off >= 0; off--) {
@@ -425,7 +431,7 @@ const mock = {
     }
     return clone({
       totalEmployees: db.employees.length,
-      counts, pendingLeaves: db.leaves.filter(l => l.status === 'pending').length,
+      counts, moodCounts, pendingLeaves: db.leaves.filter(l => l.status === 'pending').length,
       monthlyPayroll,
       trend,
     });
@@ -487,11 +493,28 @@ const mock = {
   },
 
   async getUnreadCount() {
-    const s = JSON.parse(Storage.get('dayflow_session') || 'null');
+    const s = JSON.parse(Storage.get('axiom_session') || 'null');
     if (!s) return 0;
     if (s.role === 'hr') return loadDB().leaves.filter(l => l.status === 'pending').length;
     return loadDB().leaves.filter(l => l.employeeId === s.employeeId && l.status === 'pending').length;
   },
+
+  async askAI(message) {
+    await wait(800);
+    const msg = message.toLowerCase();
+    const KB = {
+      "leave": "Our leave policy includes 18 paid leaves, 12 sick leaves, and 6 unpaid leaves per year. To apply, go to the Leave section and select your dates.",
+      "attendance": "You are required to check in daily. If you work less than 4 hours, it will be marked as a half-day.",
+      "payroll": "Salaries are credited on the 28th of every month. You can view your payslips in the Payroll section.",
+      "holiday": "Public holidays are announced at the beginning of the year. Sundays are fixed weekly offs.",
+      "hi": "Hello! I am the Axiom AI Assistant. How can I help you with our company policies today?",
+      "hello": "Hello! I am the Axiom AI Assistant. How can I help you with our company policies today?"
+    };
+    for (const [kw, resp] of Object.entries(KB)) {
+      if (msg.includes(kw)) return { reply: resp };
+    }
+    return { reply: "I'm not sure about that. Please contact HR for more specific details or try asking about leave, attendance, or payroll." };
+  }
 };
 
 /* =========================================================================
@@ -506,20 +529,12 @@ const api = {
     return request('POST', '/api/auth/login', { email, password });
   },
 
-  async googleLogin(credential) {
-    if (USE_MOCK_DATA) throw new Error("Google Login not supported in mock mode.");
-    return request('POST', '/api/auth/google-login', { credential });
+
+  async signup({ employeeId, name, email, password, role, companyKey }) {
+    if (USE_MOCK_DATA) return mock.signup({ employeeId, name, email, password, role, companyKey });
+    return request('POST', '/api/auth/signup', { employeeId, name, email, password, role, companyKey });
   },
 
-  async signup({ employeeId, name, email, password, role }) {
-    if (USE_MOCK_DATA) return mock.signup({ employeeId, name, email, password, role });
-    return request('POST', '/api/auth/signup', { employeeId, name, email, password, role });
-  },
-
-  async googleSignup({ employeeId, name, role, credential }) {
-    if (USE_MOCK_DATA) throw new Error("Google Signup not supported in mock mode.");
-    return request('POST', '/api/auth/google-signup', { employeeId, name, role, credential });
-  },
 
   /* ---------------- PROFILE ---------------- */
   async getEmployeeProfile(employeeId) {
@@ -538,9 +553,9 @@ const api = {
     return request('GET', `/api/attendance/today?employee_id=${employeeId}`);
   },
 
-  async checkIn(employeeId) {
-    if (USE_MOCK_DATA) return mock.checkIn(employeeId);
-    return request('POST', '/api/attendance/check-in', { employee_id: employeeId });
+  async checkIn(employeeId, mood) {
+    if (USE_MOCK_DATA) return mock.checkIn(employeeId, mood);
+    return request('POST', '/api/attendance/check-in', { employee_id: employeeId, mood });
   },
 
   async checkOut(employeeId) {
@@ -667,4 +682,19 @@ const api = {
     if (USE_MOCK_DATA) return mock.getUnreadCount();
     return request('GET', '/api/notifications/unread/count');
   },
+
+  async askAI(message) {
+    if (USE_MOCK_DATA) return mock.askAI(message);
+    return request('POST', '/api/ai/ask', { message });
+  },
+
+  downloadPayslip(employeeId, month) {
+    if (USE_MOCK_DATA) { toast(`Downloaded ${month} payslip.`, 'success'); return; }
+    window.location.href = `${API_URL}/api/reports/payslip/${employeeId}/${month}?token=${Storage.get(SESSION_KEY).token}`;
+  },
+
+  downloadAttendance(employeeId, month) {
+    if (USE_MOCK_DATA) { toast(`Downloaded ${month} attendance.`, 'success'); return; }
+    window.location.href = `${API_URL}/api/reports/attendance/${employeeId}?month=${month}&token=${Storage.get(SESSION_KEY).token}`;
+  }
 };
