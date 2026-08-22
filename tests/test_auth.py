@@ -1,10 +1,9 @@
 """Authentication workflows: signup, login, invalid login, duplicate signup."""
 
-
 def test_signup_success(client):
     res = client.post("/api/auth/signup", json={
         "employeeId": "E-9001", "name": "New Employee", "email": "new@test.local",
-        "password": "secret123", "role": "employee",
+        "password": "Secret!123", "role": "employee"
     })
     assert res.status_code == 201
     assert res.get_json()["success"] is True
@@ -12,11 +11,18 @@ def test_signup_success(client):
 
 def test_signup_validates_fields(client):
     bad = [
-        {"employeeId": "X", "name": "New Employee", "email": "new@test.local", "password": "secret123", "role": "employee"},
-        {"employeeId": "E-9001", "name": "Ab", "email": "new@test.local", "password": "secret123", "role": "employee"},
-        {"employeeId": "E-9001", "name": "New Employee", "email": "not-an-email", "password": "secret123", "role": "employee"},
+        # invalid ID
+        {"employeeId": "X", "name": "New Employee", "email": "new@test.local", "password": "Secret!123", "role": "employee"},
+        # invalid name
+        {"employeeId": "E-9001", "name": "Ab", "email": "new@test.local", "password": "Secret!123", "role": "employee"},
+        # invalid email
+        {"employeeId": "E-9001", "name": "New Employee", "email": "not-an-email", "password": "Secret!123", "role": "employee"},
+        # invalid password
         {"employeeId": "E-9001", "name": "New Employee", "email": "new@test.local", "password": "123", "role": "employee"},
-        {"employeeId": "E-9001", "name": "New Employee", "email": "new@test.local", "password": "secret123", "role": "manager"},
+        # invalid role
+        {"employeeId": "E-9001", "name": "New Employee", "email": "new@test.local", "password": "Secret!123", "role": "manager"},
+        # missing hr key
+        {"employeeId": "E-9001", "name": "New Employee", "email": "new@test.local", "password": "Secret!123", "role": "hr"},
     ]
     for payload in bad:
         res = client.post("/api/auth/signup", json=payload)
@@ -28,7 +34,7 @@ def test_signup_validates_fields(client):
 def test_signup_duplicate_email(client, employee_account):
     res = client.post("/api/auth/signup", json={
         "employeeId": "E-9002", "name": "Copy Cat", "email": "employee@test.local",
-        "password": "secret123", "role": "employee",
+        "password": "Secret!123", "role": "employee"
     })
     assert res.status_code == 409
     assert res.get_json()["message"] == "An account with this email already exists."
@@ -37,7 +43,7 @@ def test_signup_duplicate_email(client, employee_account):
 def test_signup_duplicate_employee_id(client, employee_account):
     res = client.post("/api/auth/signup", json={
         "employeeId": "E-8001", "name": "Copy Cat", "email": "copy@test.local",
-        "password": "secret123", "role": "employee",
+        "password": "Secret!123", "role": "employee"
     })
     assert res.status_code == 409
     assert res.get_json()["message"] == "This Employee ID is already registered."
@@ -45,7 +51,7 @@ def test_signup_duplicate_employee_id(client, employee_account):
 
 def test_login_success_shape(client, employee_account):
     res = client.post("/api/auth/login", json={
-        "email": "employee@test.local", "password": "password123",
+        "email": "employee@test.local", "password": "password123", # uses TEST_PASSWORD from conftest
     })
     assert res.status_code == 200
     body = res.get_json()
