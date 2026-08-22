@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Dayflow HRMS</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="df-shell">
+  <main id="df-content">
+
+    <div class="page-head">
+      <div>
+        <h1>Attendance</h1>
+        <p class="ph-sub" id="att-page-sub">Track your daily attendance.</p>
+      </div>
+      <div class="tabbar" id="att-tabs" style="display:none">
+        <button class="tab-link" data-tab="today">Today</button>
+        <button class="tab-link" data-tab="week">This week</button>
+        <button class="tab-link" data-tab="history">History</button>
+      </div>
+    </div>
+
+    <!-- today hero (employee) -->
+    <div class="df-card mb-3" id="att-today-card">
+      <div class="today-hero" id="att-today-body">
+        <span class="skeleton sk-block" style="width:100%"></span>
+      </div>
+    </div>
+
+    <!-- week / history (employee) -->
+    <div class="df-card mb-3" id="att-week-card" style="display:none">
+      <div class="card-head"><h3 class="card-title">This week</h3><span id="att-week-chips" class="chip-row"></span></div>
+      <div class="table-wrap" id="att-week-body"></div>
+    </div>
+    <div class="df-card mb-3" id="att-history-card" style="display:none">
+      <div class="card-head">
+        <h3 class="card-title">Attendance history</h3>
+        <input type="month" class="form-control form-control-sm" id="att-month" style="width:auto">
+      </div>
+      <div id="att-hist-summary" class="px-3 pt-2"></div>
+      <div class="table-wrap" id="att-history-body"></div>
+    </div>
+
+    <!-- HR view -->
+    <div id="att-hr-root" style="display:none">
+      <div class="df-card mb-3">
+        <div class="card-body-p">
+          <div class="filter-bar mb-0">
+            <div class="tabbar">
+              <button class="tab-link active" data-view="daily">Daily view</button>
+              <button class="tab-link" data-view="weekly">Weekly view</button>
+            </div>
+            <div id="hr-daily-filters" class="d-flex gap-2 flex-wrap ms-auto">
+              <input type="date" class="form-control" id="hr-att-date" style="width:auto" value="">
+              <select class="form-select" id="hr-att-dept" style="width:auto;min-width:160px"><option value="all">All departments</option></select>
+              <select class="form-select" id="hr-att-status" style="width:auto;min-width:140px">
+                <option value="all">All statuses</option>
+                <option value="present">Present</option>
+                <option value="absent">Absent</option>
+                <option value="half-day">Half-day</option>
+                <option value="leave">On leave</option>
+                <option value="not-marked">Not marked</option>
+              </select>
+            </div>
+            <div id="hr-week-nav" class="d-flex gap-2 align-items-center ms-auto" style="display:none">
+              <button class="btn btn-ghost btn-sm" id="hr-week-prev">‹ Prev</button>
+              <b class="small-2 nowrap" id="hr-week-label">—</b>
+              <button class="btn btn-ghost btn-sm" id="hr-week-next">Next ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chip-row mb-3" id="hr-att-chips"></div>
+      <div class="df-card"><div class="table-wrap" id="hr-att-body">
+        <div class="p-3"><span class="skeleton sk-line w-80"></span><span class="skeleton sk-line w-60"></span><span class="skeleton sk-line w-80"></span></div>
+      </div></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script src="js/attendance.js"></script>
+</body>
+</html>
